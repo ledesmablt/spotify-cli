@@ -14,6 +14,7 @@ class SpotifyHandler:
 
 
     def get_credentials(self):
+        """Read locally stored credentials file for API authorization."""
         if not os.path.exists(CREDS_PATH):
             return {}
 
@@ -24,11 +25,17 @@ class SpotifyHandler:
 
 
     def is_expired(self):
+        """Check if access token in credentials file is expired."""
         creds = self.get_credentials()
         return int(time.time()) > creds.get('expires_on', 0)
 
 
     def refresh(self, auth_code=None):
+        """Refresh Spotify access token.
+
+        Optional arguments:
+        auth_code -- if supplied, pulls new access and refresh tokens.
+        """
         post_data = {}
         if auth_code:
             post_data = {'auth_code': auth_code}
@@ -58,6 +65,7 @@ class SpotifyHandler:
             creds['auth_code'] = auth_code
             creds.update(refresh_data)
             json.dump(creds, f)
+
         return refresh_data
 
 
@@ -75,7 +83,11 @@ class SpotifyHandler:
 
 
     def request(self, endpoint, method='GET', headers={}, json=None, data=None):
+        """Request wrapper for Spotify API endpoints. Handles errors, authorization,
+        and refreshing access if needed.
+        """
         if self.is_expired():
+            # check creds file if token expired
             self.refresh()
 
         access_token = self.get_credentials().get('access_token')
@@ -98,6 +110,7 @@ class SpotifyHandler:
         data = self._handle_request(req, endpoint, request_kwargs)
 
         if 'expired' in data.get('error', {}).get('message', ''):
+            # refresh & retry in case response says expired
             self.refresh()
             access_token = self.get_credentials().get('access_token')
             data = self._handle_request(req, endpoint, request_kwargs)
