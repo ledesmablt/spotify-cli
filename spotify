@@ -1,0 +1,15 @@
+#!/usr/bin/python3
+import click
+
+from commands.auth import auth
+
+
+@click.group()
+def cli():
+    pass
+
+cli.add_command(auth)
+
+
+if __name__ == '__main__':
+    cli()
