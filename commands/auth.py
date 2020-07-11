@@ -5,6 +5,8 @@ import urllib.parse as ul
 from uuid import uuid1
 
 import requests
+import click
+
 
 # storage
 HOME = os.path.expanduser('~')
@@ -72,9 +74,21 @@ def refresh(auth_code=None):
         raise Exception('Error in obtaining access token. Please try again.')
 
     refresh_data['expires_on'] = int(time.time()) + refresh_data['expires_in']
+    if auth_code:
+        refresh_data['auth_code'] = auth_code
+
+    with open(CREDS_PATH, 'w+') as f:
+        try:
+            creds = json.load(f)
+        except:
+            creds = {}
+        creds['auth_code'] = auth_code
+        creds.update(refresh_data)
+        json.dump(creds, f)
     return refresh_data
 
 
+@click.command()
 def login():
     try:
         import webbrowser
@@ -84,25 +98,17 @@ def login():
 
     auth_code = input('Enter verification code: ')
     print('\nObtaining access token...')
-    refresh_json = refresh(auth_code)
-    with open(CREDS_PATH, 'w+') as f:
-        try:
-            creds = json.load(f)
-        except:
-            creds = {}
-        creds['auth_code'] = auth_code
-        creds.update(refresh_json)
-        json.dump(creds, f)
-
+    refresh(auth_code)
     print('Credentials saved to ' + CREDS_PATH)
     return
 
 
+@click.command()
 def status():
     creds = get_credentials()
     if _is_expired():
-        print('expired!')
-        refresh(refresh_token=creds['refresh_token'])
+        refresh()
+        creds = get_credentials()
 
     headers = {'Authorization': 'Bearer ' + creds['access_token']}
     res = requests.get(AUTH_STATUS_URL, headers=headers)
@@ -115,8 +121,16 @@ def status():
     return
 
 
+# CLI group
+@click.group()
+def auth():
+    pass
+
+auth.add_command(login)
+auth.add_command(status)
+
+
 if __name__ == '__main__':
     # test login and refresh
     login()
-    refresh()
     status()
