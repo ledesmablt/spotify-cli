@@ -7,11 +7,14 @@ import requests
 
 # storage
 HOME = os.path.expanduser('~')
-CREDS_DIR = os.path.join(HOME, '.config')
+CONFIG_DIR = os.path.join(HOME, '.config')
+CREDS_DIR = os.path.join(CONFIG_DIR, 'spotify-cli')
+if not os.path.exists(CONFIG_DIR):
+    os.mkdir(CONFIG_DIR)
 if not os.path.exists(CREDS_DIR):
     os.mkdir(CREDS_DIR)
 
-CREDS_PATH = os.path.join(CREDS_DIR, 'spotify-cli-credentials.json')
+CREDS_PATH = os.path.join(CREDS_DIR, 'credentials.json')
 
 # auth
 REFRESH_URI = 'https://asia-east2-spotify-cli-283006.cloudfunctions.net/auth-refresh'
