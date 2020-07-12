@@ -56,12 +56,12 @@ def refresh(auth_code=None):
     return refresh_data
 
 
-def _handle_request(req, endpoint, kwargs):
+def _handle_request(req, endpoint, headers, **kwargs):
     try:
         if endpoint.startswith('/'):
             endpoint = endpoint[1:]
 
-        res = req(API_URL + endpoint, **kwargs)
+        res = req(API_URL + endpoint, headers=headers, **kwargs)
         data = res.json()
     except:
         raise Exception('Invalid request')
@@ -69,7 +69,7 @@ def _handle_request(req, endpoint, kwargs):
     return data
 
 
-def request(endpoint, method='GET', headers={}, json=None, data=None):
+def request(endpoint, method='GET', headers={}, **kwargs):
     """Request wrapper for Spotify API endpoints. Handles errors, authorization,
     and refreshing access if needed.
     """
@@ -85,18 +85,13 @@ def request(endpoint, method='GET', headers={}, json=None, data=None):
     else:
         raise Exception('Please use a valid method')
 
-    request_kwargs = {
-        'headers': headers,
-        'json': json,
-        'data': data
-    }
-    data = _handle_request(req, endpoint, request_kwargs)
+    data = _handle_request(req, endpoint, headers=headers, **kwargs)
 
     if 'expired' in data.get('error', {}).get('message', ''):
         # refresh & retry if response says expired
         refresh()
         access_token = get_credentials().get('access_token')
         request_kwargs['headers']['Authorization'] = 'Bearer ' + access_token
-        data = _handle_request(req, endpoint, request_kwargs)
+        data = _handle_request(req, endpoint, headers=headers, **kwargs)
 
     return data
