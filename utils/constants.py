@@ -27,8 +27,8 @@ AUTH_SCOPES = [
 ]
 AUTH_URL = (
     'https://accounts.spotify.com/authorize'
-    '?client_id=' + CLIENT_ID +
-    '&response_type=code'
-    '&redirect_uri=' + ul.quote_plus(REDIRECT_URI) +
-    '&scope=' + ul.quote_plus(' '.join(AUTH_SCOPES))
+    + f'?client_id={CLIENT_ID}'
+    + f'&response_type=code'
+    + f'&redirect_uri={ul.quote_plus(REDIRECT_URI)}'
+    + f'&scope={ul.quote_plus(" ".join(AUTH_SCOPES))}'
 )

@@ -75,7 +75,7 @@ def request(endpoint, method='GET', headers={}, json=None, data=None):
     """
     access_token = get_credentials().get('access_token')
     if not access_token:
-        raise Exception('Please authenticate the CLI (spotify auth login)')
+        raise AuthorizationError
 
     headers['Authorization'] = 'Bearer ' + access_token
     if method == 'GET':
