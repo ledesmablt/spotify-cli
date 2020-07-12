@@ -57,16 +57,16 @@ def refresh(auth_code=None):
 
 
 def _handle_request(req, endpoint, headers, **kwargs):
-    try:
-        if endpoint.startswith('/'):
-            endpoint = endpoint[1:]
+    if endpoint.startswith('/'):
+        endpoint = endpoint[1:]
 
-        res = req(API_URL + endpoint, headers=headers, **kwargs)
-        data = res.json()
-    except:
-        raise Exception('Invalid request')
-
-    return data
+    res = req(API_URL + endpoint, headers=headers, **kwargs)
+    if res.status_code == 200:
+        return res.json()
+    elif res.status_code == 204:
+        return {}
+    else:
+        raise Exception(f'Invalid request {res.status_code}')
 
 
 def request(endpoint, method='GET', headers={}, **kwargs):
