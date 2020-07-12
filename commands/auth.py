@@ -6,10 +6,9 @@ from uuid import uuid1
 import click
 import requests
 
-from utils.classes import SpotifyHandler
+from utils import Spotify
 from utils.constants import AUTH_URL, CREDS_PATH 
 
-Spotify = SpotifyHandler()
 
 @click.command()
 def login():
