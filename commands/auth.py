@@ -27,7 +27,7 @@ def login():
 
 
 @click.command()
-@click.option('-v/-s', '--verbose/--short', default=False)
+@click.option('-v', '--verbose', is_flag=True)
 def status(verbose):
     user_data = Spotify.request('me', method='GET')
     click.echo(f"Logged in as {user_data['display_name']}")
