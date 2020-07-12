@@ -1,5 +1,4 @@
 import os
-import time
 import json
 
 import requests
@@ -22,12 +21,6 @@ class SpotifyHandler:
             creds = json.load(f)
 
         return creds
-
-
-    def is_expired(self):
-        """Check if access token in credentials file is expired."""
-        creds = self.get_credentials()
-        return int(time.time()) > creds.get('expires_on', 0)
 
 
     def refresh(self, auth_code=None):
@@ -53,7 +46,6 @@ class SpotifyHandler:
         except:
             raise AuthorizationError
 
-        refresh_data['expires_on'] = int(time.time()) + refresh_data['expires_in']
         if auth_code:
             refresh_data['auth_code'] = auth_code
 
@@ -86,10 +78,6 @@ class SpotifyHandler:
         """Request wrapper for Spotify API endpoints. Handles errors, authorization,
         and refreshing access if needed.
         """
-        if self.is_expired():
-            # check creds file if token expired
-            self.refresh()
-
         access_token = self.get_credentials().get('access_token')
         if not access_token:
             raise Exception('Please authenticate the CLI (spotify auth login)')
@@ -110,9 +98,10 @@ class SpotifyHandler:
         data = self._handle_request(req, endpoint, request_kwargs)
 
         if 'expired' in data.get('error', {}).get('message', ''):
-            # refresh & retry in case response says expired
+            # refresh & retry if response says expired
             self.refresh()
             access_token = self.get_credentials().get('access_token')
+            request_kwargs['headers']['Authorization'] = 'Bearer ' + access_token
             data = self._handle_request(req, endpoint, request_kwargs)
 
         return data
