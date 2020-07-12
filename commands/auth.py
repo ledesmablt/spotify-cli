@@ -17,22 +17,22 @@ def login():
         import webbrowser
         webbrowser.open(url)
     except:
-        print('Go to the following link in your browser:\n\n\t' + url)
+        print(f'Go to the following link in your browser:\n\n\t{url}')
 
     auth_code = input('Enter verification code: ')
     print('\nObtaining access token...')
     Spotify.refresh(auth_code)
-    print('Credentials saved to ' + CREDS_PATH)
+    print(f'Credentials saved to {CREDS_PATH}')
     return
 
 
 @click.command()
-def status():
+@click.option('-v/-s', '--verbose/--short', default=False)
+def status(verbose):
     user_data = Spotify.request('me', method='GET')
-    try:
-        print('Logged in as {}'.format(user_data['display_name']))
-    except:
-        print('LOGIN ERROR')
+    click.echo(f"Logged in as {user_data['display_name']}")
+    if verbose:
+        click.echo(f'Credentials stored in {CREDS_PATH}')
     return
 
 
