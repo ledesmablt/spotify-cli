@@ -1,15 +1,15 @@
-#!/usr/bin/python3
+#!/usr/bin/python3 -B
 import click
 
 from commands.auth import auth
 
 
 @click.group()
-def cli():
+def spotify():
     pass
 
-cli.add_command(auth)
+spotify.add_command(auth)
 
 
 if __name__ == '__main__':
-    cli()
+    spotify()
