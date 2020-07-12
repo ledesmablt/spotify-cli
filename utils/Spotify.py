@@ -65,8 +65,11 @@ def _handle_request(req, endpoint, headers, **kwargs):
         return res.json()
     elif res.status_code == 204:
         return {}
+    elif res.status_code == 401:
+        if 'expired' in res.json().get('error', {}).get('message', ''):
+            raise TokenExpired
     else:
-        raise Exception(f'Invalid request {res.status_code}')
+        raise Exception(f'Invalid request {res.status_code} - {res.text}')
 
 
 def request(endpoint, method='GET', headers={}, **kwargs):
@@ -85,13 +88,12 @@ def request(endpoint, method='GET', headers={}, **kwargs):
     else:
         raise Exception('Please use a valid method')
 
-    data = _handle_request(req, endpoint, headers=headers, **kwargs)
-
-    if 'expired' in data.get('error', {}).get('message', ''):
-        # refresh & retry if response says expired
-        refresh()
-        access_token = get_credentials().get('access_token')
-        request_kwargs['headers']['Authorization'] = 'Bearer ' + access_token
+    try:
+        data = _handle_request(req, endpoint, headers=headers, **kwargs)
+    except TokenExpired:
+        # refresh & retry if expired
+        access_token = refresh()['access_token']
+        headers['Authorization'] = 'Bearer ' + access_token
         data = _handle_request(req, endpoint, headers=headers, **kwargs)
 
     return data
