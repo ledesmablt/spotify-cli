@@ -1,10 +1,10 @@
 import os
 import json
+from urllib.error import HTTPError
+from urllib.request import Request, urlopen
 
-import requests
-
+from utils.constants import *
 from utils.exceptions import *
-from utils.constants import CREDS_PATH, REFRESH_URI, API_URL
 
 
 def get_credentials():
@@ -34,21 +34,25 @@ def refresh(auth_code=None):
         else:
             raise AuthorizationError
 
-    refresh_res = requests.post(REFRESH_URI, json=post_data)
-    try:
-        refresh_data = refresh_res.json()
-        assert 'access_token' in refresh_data.keys()
-    except:
-        raise AuthorizationError
-
-    if auth_code:
-        refresh_data['auth_code'] = auth_code
+    req = Request(
+        REFRESH_URI,
+        json.dumps(post_data).encode('ascii'),
+        DEFAULT_HEADERS,
+        method='POST'
+    )
+    with urlopen(req) as refresh_res:
+        try:
+            refresh_data = json.load(refresh_res)
+            assert 'access_token' in refresh_data.keys()
+        except:
+            raise AuthorizationError
 
     with open(CREDS_PATH, 'w+') as f:
         try:
             creds = json.load(f)
         except:
             creds = {}
+
         creds['auth_code'] = auth_code
         creds.update(refresh_data)
         json.dump(creds, f)
@@ -56,23 +60,32 @@ def refresh(auth_code=None):
     return refresh_data
 
 
-def _handle_request(req, endpoint, headers, **kwargs):
+def _handle_request(endpoint, method='GET', data=None, headers={}):
     if endpoint.startswith('/'):
         endpoint = endpoint[1:]
 
-    res = req(API_URL + endpoint, headers=headers, **kwargs)
-    if res.status_code == 200:
-        return res.json()
-    elif res.status_code == 204:
-        return {}
-    elif res.status_code == 401:
-        if 'expired' in res.json().get('error', {}).get('message', ''):
+    if data:
+        data = json.dumps(data).encode('ascii')
+        
+    req = Request(
+        API_URL + endpoint,
+        data,
+        headers,
+        method=method
+    )
+
+    try:
+        with urlopen(req) as res:
+            if res.status == 200:
+                return json.load(res)
+            elif res.status == 204:
+                return {}
+    except HTTPError as e:
+        if e.status == 401:
             raise TokenExpired
-    else:
-        raise Exception(f'Invalid request {res.status_code} - {res.text}')
 
 
-def request(endpoint, method='GET', headers={}, **kwargs):
+def request(endpoint, method='GET', data=None, headers=DEFAULT_HEADERS):
     """Request wrapper for Spotify API endpoints. Handles errors, authorization,
     and refreshing access if needed.
     """
@@ -81,19 +94,12 @@ def request(endpoint, method='GET', headers={}, **kwargs):
         raise AuthorizationError
 
     headers['Authorization'] = 'Bearer ' + access_token
-    if method == 'GET':
-        req = requests.get
-    elif method == 'POST':
-        req = requests.post
-    else:
-        raise Exception('Please use a valid method')
-
     try:
-        data = _handle_request(req, endpoint, headers=headers, **kwargs)
+        data = _handle_request(endpoint, method=method, data=data, headers=headers)
     except TokenExpired:
         # refresh & retry if expired
         access_token = refresh()['access_token']
         headers['Authorization'] = 'Bearer ' + access_token
-        data = _handle_request(req, endpoint, headers=headers, **kwargs)
+        data = _handle_request(endpoint, method=method, data=data, headers=headers)
 
     return data

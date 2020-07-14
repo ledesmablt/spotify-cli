@@ -4,7 +4,6 @@ import time
 from uuid import uuid1
 
 import click
-import requests
 
 from utils import Spotify
 from utils.constants import AUTH_URL, CREDS_PATH 

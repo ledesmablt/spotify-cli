@@ -3,6 +3,9 @@ import urllib.parse as ul
 
 # spotify API URL
 API_URL = 'https://api.spotify.com/v1/'
+DEFAULT_HEADERS = {
+    'Content-Type': 'application/json'
+}
 
 # credential storage
 HOME = os.path.expanduser('~')
