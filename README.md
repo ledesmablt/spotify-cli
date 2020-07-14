@@ -8,6 +8,17 @@
 		- finish / fail - redirect to github
 	- auth refresh
 
+- Spotify handler
+	- manage auth
+		- access & refresh
+		- [optional] additional auth scopes (i.e. playlists, etc)
+	- handle API requests (w/ auth)
+	- search handler (class - stateful)
+			- list results (can be non-interactive)
+			- some sort of UI for going through search results (1-5, next/prev)
+					- could use [PyInquirer](https://github.com/CITGuru/PyInquirer)
+			- support for playlists, albums, etc
+
 - cli
 	- 100% API
 	- commands
