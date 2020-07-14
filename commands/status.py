@@ -24,11 +24,12 @@ def status(verbose=0, raw=False):
         raise PodcastNotSupported
 
     data['is_shuffle'] = res['shuffle_state']
-    data['is_repeat'] = res['repeat_state']
+    data['is_repeat'] = False if res['repeat_state'] == 'off' else res['repeat_state']
     data['is_playing'] = res['is_playing']
     data['device'] = {
         'name': res['device']['name'],
         'type': res['device']['type'],
+        'volume': res['device']['volume_percent'],
     }
     item = res['item']
     data['music'] = {
@@ -62,6 +63,13 @@ def status(verbose=0, raw=False):
         playback_options.append('repeat')
     if data['is_shuffle']:
         playback_options.append('shuffle')
+    playback_str = ''
+    if data['is_playing']:
+        playback_options_str = f"""{'on {}'.format(' and '.join(playback_options) + ', ')
+            if playback_options else ''
+        }"""
+        playback_str = f"({playback_options_str}{data['device']['volume']}% volume)".format(
+        )
 
     # output
     if not verbose:
@@ -76,10 +84,7 @@ def status(verbose=0, raw=False):
             f"Song    {music['song']['name']} ({music['song']['progress']} / {music['song']['duration']})",
             f"Artist  {music['artist']['name']}",
             f"Album   {music['album']['name']}",
-            f"Status  {playback_status}"
-            f"""{' (on {})'.format(' and '.join(playback_options))
-                if playback_options and data['is_playing'] else ''
-            }"""
+            f"Status  {playback_status} {playback_str}"
         ]))
 
     if verbose >= 2:
