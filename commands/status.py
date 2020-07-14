@@ -1,13 +1,6 @@
-import os
-import json
-import time
-from uuid import uuid1
-
 import click
-import requests
 
 from utils import Spotify
-from utils.constants import AUTH_URL, CREDS_PATH 
 from utils.exceptions import *
 from utils.functions import format_duration_ms
 
@@ -88,9 +81,10 @@ def status(verbose, raw):
                 ' and '.join(playback_options) if playback_options and data['is_playing'] else ''
             )}"""
         ]))
+
     if verbose >= 2:
-        click.echo('')
         click.echo('\n'.join([
+            '',
             f"Device  {data['device']['name']} ({data['device']['type']})",
             f"URL:    {music['song']['url']}"
         ]))
