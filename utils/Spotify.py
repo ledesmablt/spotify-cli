@@ -47,14 +47,12 @@ def refresh(auth_code=None):
         except:
             raise AuthorizationError
 
-    with open(CREDS_PATH, 'w+') as f:
-        try:
-            creds = json.load(f)
-        except:
-            creds = {}
-
+    creds = get_credentials()
+    creds.update(refresh_data)
+    if auth_code:
         creds['auth_code'] = auth_code
-        creds.update(refresh_data)
+
+    with open(CREDS_PATH, 'w+') as f:
         json.dump(creds, f)
 
     return refresh_data
