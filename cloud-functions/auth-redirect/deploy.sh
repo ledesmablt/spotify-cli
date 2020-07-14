@@ -1,5 +1,4 @@
 #!/bin/bash
-rm -rf __pycache__ && \
 gcloud functions deploy \
 	auth-redirect \
 	--entry-point main \

@@ -9,7 +9,6 @@ with open('credentials.json') as f:
 
 def main(request):
     request_data = request.get_json()
-    print(request_data)
     auth_code = request_data.get('auth_code')
     refresh_token = request_data.get('refresh_token')
     post_data = {
