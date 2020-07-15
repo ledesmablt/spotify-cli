@@ -25,20 +25,20 @@ def devices(verbose=0, raw=False, switch_to=''):
         key=lambda x: (x['is_active'], x['type'], x['name'])
     )
     for device in devices_list:
-        device['formatted_name'] = f"{device['name']} - {device['type']}"
+        device['formatted_name'] = '{} - {}'.format(device['name'], device['type'])
 
     # output
     if not switch_to:
         if not verbose:
             output_list = map(
-                lambda x: f"* {x['name']}" if x['is_active'] else f"  {x['name']}",
+                lambda x: '* ' + x['name'] if x['is_active'] else '  ' + x['name'],
                 sorted(devices_list, key=lambda x: x['name'])
             )
             click.echo('\n'.join(output_list))
 
         else:
             output_list = map(
-                lambda x: f"* {x['formatted_name']}" if x['is_active'] else f"  {x['formatted_name']}",
+                lambda x: '* ' + x['formatted_name'] if x['is_active'] else '  ' + x['formatted_name'],
                 sorted(devices_list, key=lambda x: x['formatted_name'])
             )
             click.echo('\n'.join(output_list))
@@ -84,13 +84,13 @@ def devices(verbose=0, raw=False, switch_to=''):
 
     to_activate = matched_devices[0]
     if to_activate['is_active']:
-        click.echo(f"{to_activate['formatted_name']} is already active.")
+        click.echo(to_activate['formatted_name'] + ' is already active.')
         return
 
     post_data = {
         'device_ids': [to_activate['id']],
     }
     Spotify.request('me/player', method='PUT', data=post_data)
-    print(f"Switched to {to_activate['formatted_name']}")
+    print('Switched to ' + to_activate['formatted_name'])
 
     return
