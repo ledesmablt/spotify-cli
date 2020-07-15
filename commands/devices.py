@@ -11,7 +11,7 @@ def _list(verbose=0, raw=False):
     res = Spotify.request('me/player/devices', method='GET')
     if raw:
         click.echo(res)
-        return
+        return res
 
     if not res:
         raise NoPlaybackError

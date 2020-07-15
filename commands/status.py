@@ -12,7 +12,7 @@ def status(verbose=0, raw=False):
     res = Spotify.request('me/player', method='GET')
     if raw:
         click.echo(res)
-        return
+        return res
 
     if not res:
         raise NoPlaybackError
