@@ -16,7 +16,9 @@ def login():
         import webbrowser
         webbrowser.open(url)
     except:
-        print('Go to the following link in your browser:\n\n\t{}'.format(url))
+        pass
+    
+    print('Go to the following link in your browser:\n\n\t{}\n'.format(url))
 
     auth_code = input('Enter verification code: ')
     print('\nObtaining access token...')
