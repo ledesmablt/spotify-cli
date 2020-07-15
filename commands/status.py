@@ -65,34 +65,56 @@ def status(verbose=0, raw=False):
         playback_options.append('shuffle')
     playback_str = ''
     if data['is_playing']:
-        playback_options_str = f"""{'on {}'.format(' and '.join(playback_options) + ', ')
+        playback_options_str = '{}'.format(
+            'on {}'.format(' and '.join(playback_options) + ', ')
             if playback_options else ''
-        }"""
-        playback_str = f"({playback_options_str}{data['device']['volume']}% volume)".format(
+        )
+        playback_str = "({}{}% volume)".format(
+            playback_options_str, data['device']['volume']
         )
 
     # output
     if not verbose:
         click.echo(
-            f"{playback_status}: {' ' if not data['is_playing'] else ''}"
-            f"{music['song']['name']}"
-            f"\n         {music['artist']['name']} - {music['album']['name']}"
+            '{}: {}{}\n'
+            '         {} - {}'
+            .format(
+                playback_status,
+                ' ' if not data['is_playing'] else '',
+                music['song']['name'],
+                music['artist']['name'],
+                music['album']['name']
+            )
         )
 
     if verbose >= 1:
-        click.echo('\n'.join([
-            f"Song    {music['song']['name']} ({music['song']['progress']} / {music['song']['duration']})",
-            f"Artist  {music['artist']['name']}",
-            f"Album   {music['album']['name']}",
-            f"Status  {playback_status} {playback_str}"
-        ]))
+        click.echo(
+            'Song    {} ({} / {})\n'
+            'Artist  {}\n'
+            'Album   {}\n'
+            'Status  {} {}'
+            .format(
+                music['song']['name'],
+                music['song']['progress'],
+                music['song']['duration'],
+                music['artist']['name'],
+                music['album']['name'],
+                playback_status,
+                playback_str
+            )
+        )
 
     if verbose >= 2:
-        click.echo('\n'.join([
-            '',
-            f"Device  {data['device']['name']} ({data['device']['type']})",
-            f"URL:    {music['song']['url']}"
-        ]))
+        click.echo(
+            '\n'
+            'Device  {} ({})\n'
+            'URL:    {}'
+            .format(
+                data['device']['name'],
+                data['device']['type'],
+                music['song']['url']
+            )
+        )
 
 
     return

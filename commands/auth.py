@@ -16,12 +16,12 @@ def login():
         import webbrowser
         webbrowser.open(url)
     except:
-        print(f'Go to the following link in your browser:\n\n\t{url}')
+        print('Go to the following link in your browser:\n\n\t{}'.format(url))
 
     auth_code = input('Enter verification code: ')
     print('\nObtaining access token...')
     Spotify.refresh(auth_code)
-    print(f'Credentials saved to {CREDS_PATH}')
+    print('Credentials saved to {}'.format(CREDS_PATH))
     return
 
 
@@ -29,9 +29,9 @@ def login():
 @click.option('-v', '--verbose', is_flag=True)
 def status(verbose):
     user_data = Spotify.request('me', method='GET')
-    click.echo(f"Logged in as {user_data['display_name']}")
+    click.echo('Logged in as {}'.format(user_data['display_name']))
     if verbose:
-        click.echo(f'Credentials stored in {CREDS_PATH}')
+        click.echo('Credentials stored in {}'.format(CREDS_PATH))
     return
 
 

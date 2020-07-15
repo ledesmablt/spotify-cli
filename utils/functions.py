@@ -8,7 +8,7 @@ def format_duration_ms(ms):
 
     s = int(ms / 1000)
     if s < 60:
-        return f'00:{_format(s)}'
+        return '00:{}'.format(_format(s))
 
     m, s = divmod(s, 60)
-    return f'{_format(m)}:{_format(s)}'
+    return '{}:{}'.format(_format(m), _format(s))

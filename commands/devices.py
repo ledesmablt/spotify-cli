@@ -51,12 +51,12 @@ def devices(verbose=0, raw=False, switch_to=''):
     num_matched = len(matched_devices)
     if num_matched != 1:
         if num_matched == 0:
-            click.echo(f'"{switch_to}" not found.')
+            click.echo('"{}" not found.'.format(switch_to))
             message = 'Please select a valid device.\n'
             choices = devices_list
         else:
-            click.echo(f'{num_matched} devices matched "{switch_to}".')
-            message = f'Please select the device to activate below.\n'
+            click.echo('{} devices matched "{}".'.format(num_matched, switch_to))
+            message = 'Please select the device to activate below.\n'
             choices = matched_devices
 
         choices = map(
