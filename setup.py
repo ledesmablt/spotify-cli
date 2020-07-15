@@ -6,6 +6,7 @@ setup(
     py_modules=['spotify'],
     install_requires=[
         'Click',
+        'PyInquirer',
     ],
     entry_points='''
         [console_scripts]

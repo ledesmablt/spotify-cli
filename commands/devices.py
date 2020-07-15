@@ -24,6 +24,8 @@ def devices(verbose=0, raw=False, switch_to=''):
         res['devices'],
         key=lambda x: (x['is_active'], x['type'], x['name'])
     )
+    for device in devices_list:
+        device['formatted_name'] = f"{device['name']} - {device['type']}"
 
     # output
     if not switch_to:
@@ -34,43 +36,61 @@ def devices(verbose=0, raw=False, switch_to=''):
             )
             click.echo('\n'.join(output_list))
 
-        if verbose == 1:
+        else:
             output_list = map(
-                lambda x: f"* {x['name']} - {x['type']}" if x['is_active'] else f"  {x['name']} - {x['type']}",
-                sorted(devices_list, key=lambda x: x['name'])
+                lambda x: f"* {x['formatted_name']}" if x['is_active'] else f"  {x['formatted_name']}",
+                sorted(devices_list, key=lambda x: x['formatted_name'])
             )
             click.echo('\n'.join(output_list))
 
         return
 
 
-    if not switch_to:
-        switch_to = ''
-        # interactive prompt
-        pass
-
-    matched_devices = [x for x in devices_list if switch_to.lower() in (x['name'] + x['type']).lower()]
+    # switch-to handler
+    matched_devices = [x for x in devices_list if switch_to.lower() in x['formatted_name'].lower()]
     num_matched = len(matched_devices)
     if num_matched != 1:
         if num_matched == 0:
-            click.echo(
-                f'"{switch_to}" not found. Please select a valid device.',
-                err=True
-            )
+            click.echo(f'"{switch_to}" not found.')
+            message = 'Please select a valid device.\n'
+            choices = devices_list
         else:
-            click.echo(
-                f'{num_matched} devices matched "{switch_to}". Please select the device to activate below.'
-            )
+            click.echo(f'{num_matched} devices matched "{switch_to}".')
+            message = f'Please select the device to activate below.\n'
+            choices = matched_devices
+
+        choices = map(
+            lambda x: {
+                'value': x['formatted_name'],
+                'name': x['formatted_name'] + ('' if not x['is_active'] else ' (active)'),
+            },
+            sorted(choices, key=lambda x: (x['is_active'], x['formatted_name']))
+        )
 
         # interactive prompt
-        return
+        from PyInquirer import prompt
+        questions = [{
+            'type': 'list',
+            'name': 'formatted_name',
+            'message': message,
+            'choices': choices,
+        }]
+        choice = prompt(questions)
+        if not choice:
+            return
+
+        matched_devices = [x for x in devices_list if choice['formatted_name'] == x['formatted_name']]
 
 
     to_activate = matched_devices[0]
+    if to_activate['is_active']:
+        click.echo(f"{to_activate['formatted_name']} is already active.")
+        return
+
     post_data = {
         'device_ids': [to_activate['id']],
     }
     Spotify.request('me/player', method='PUT', data=post_data)
-    print(f"Switched to {to_activate['name']} - {to_activate['type']}")
+    print(f"Switched to {to_activate['formatted_name']}")
 
     return
