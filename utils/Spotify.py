@@ -71,7 +71,6 @@ def _handle_request(endpoint, method='GET', data=None, headers={}):
         headers,
         method=method
     )
-
     try:
         with urlopen(req) as res:
             if res.status == 200:
@@ -93,11 +92,11 @@ def request(endpoint, method='GET', data=None, headers=DEFAULT_HEADERS):
 
     headers['Authorization'] = 'Bearer ' + access_token
     try:
-        data = _handle_request(endpoint, method=method, data=data, headers=headers)
+        res_data = _handle_request(endpoint, method=method, data=data, headers=headers)
     except TokenExpired:
         # refresh & retry if expired
         access_token = refresh()['access_token']
         headers['Authorization'] = 'Bearer ' + access_token
-        data = _handle_request(endpoint, method=method, data=data, headers=headers)
+        res_data = _handle_request(endpoint, method=method, data=data, headers=headers)
 
-    return data
+    return res_data
