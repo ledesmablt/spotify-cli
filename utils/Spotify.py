@@ -41,10 +41,12 @@ def refresh(auth_code=None):
         method='POST'
     )
     with urlopen(req) as refresh_res:
-        try:
-            refresh_data = json.load(refresh_res)
-            assert 'access_token' in refresh_data.keys()
-        except:
+        refresh_str = refresh_res.read()
+        if type(refresh_str) == bytes:
+            refresh_str = refresh_str.decode('utf-8')
+
+        refresh_data = json.loads(refresh_str)
+        if 'access_token' not in refresh_data.keys():
             raise AuthorizationError
 
     creds = get_credentials()
@@ -74,9 +76,14 @@ def _handle_request(endpoint, method='GET', data=None, headers={}):
     try:
         with urlopen(req) as res:
             if res.status == 200:
-                return json.load(res)
+                res_str = res.read()
+                if type(res_str) == bytes:
+                    res_str = res_str.decode('utf-8')
+
+                return json.loads(res_str)
             elif res.status == 204:
                 return {}
+
     except HTTPError as e:
         if e.status == 401:
             raise TokenExpired
