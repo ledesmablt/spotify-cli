@@ -1,7 +1,7 @@
 # Custom
 *.json
 *backup*
-start.sh
+*.sh
 
 
 # Byte-compiled / optimized / DLL files
