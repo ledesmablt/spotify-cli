@@ -1,13 +1,13 @@
 import click
 
-from utils import Spotify
+from cli.utils import Spotify
 
 
-@click.command(name='next')
+@click.command()
 @click.option('-v', '--verbose', count=True)
 @click.option('-q', '--quiet', is_flag=True)
-def _next(verbose=0, quiet=False):
-    Spotify.request('me/player/next', method='POST')
+def prev(verbose=0, quiet=False):
+    Spotify.request('me/player/previous', method='POST')
     if not quiet:
         from commands.status import status
         status.callback(verbose=verbose)

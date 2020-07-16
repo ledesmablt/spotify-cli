@@ -3,8 +3,8 @@ import json
 from urllib.error import HTTPError
 from urllib.request import Request, urlopen
 
-from utils.constants import *
-from utils.exceptions import *
+from cli.utils.constants import *
+from cli.utils.exceptions import *
 
 
 def get_credentials():

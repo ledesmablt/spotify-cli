@@ -1,7 +1,7 @@
 import click
 
-from utils import Spotify
-from utils.exceptions import *
+from cli.utils import Spotify
+from cli.utils.exceptions import *
 
 
 @click.command()

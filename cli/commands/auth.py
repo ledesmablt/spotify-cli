@@ -5,8 +5,8 @@ from uuid import uuid1
 
 import click
 
-from utils import Spotify
-from utils.constants import AUTH_URL, CREDS_PATH 
+from cli.utils import Spotify
+from cli.utils.constants import AUTH_URL, CREDS_PATH 
 
 
 @click.command()
