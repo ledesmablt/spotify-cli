@@ -9,7 +9,7 @@ from cli.utils import Spotify
 def _next(verbose=0, quiet=False):
     Spotify.request('me/player/next', method='POST')
     if not quiet:
-        from commands.status import status
+        from cli.commands.status import status
         status.callback(verbose=verbose)
 
     return
