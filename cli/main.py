@@ -7,6 +7,7 @@ from cli.commands.pause import pause
 from cli.commands.next import _next
 from cli.commands.prev import prev
 from cli.commands.devices import devices
+from cli.commands.volume import volume
 
 
 @click.group()
@@ -20,3 +21,4 @@ cli.add_command(pause)
 cli.add_command(_next)
 cli.add_command(prev)
 cli.add_command(devices)
+cli.add_command(volume)

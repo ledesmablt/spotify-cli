@@ -11,7 +11,9 @@ from cli.utils.functions import format_duration_ms
 def status(verbose=0, raw=False):
     res = Spotify.request('me/player', method='GET')
     if raw:
-        click.echo(res)
+        if verbose >= 0:
+            click.echo(res)
+
         return res
 
     if not res:
