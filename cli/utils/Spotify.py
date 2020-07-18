@@ -88,7 +88,7 @@ def _handle_request(endpoint, method='GET', data=None, headers={}):
         if e.status == 401:
             raise TokenExpired
         else:
-            raise SpotifyAPIError(message=e.msg)
+            raise SpotifyAPIError(message=e.msg, status=e.status)
 
 
 def request(endpoint, method='GET', data=None, headers=DEFAULT_HEADERS):

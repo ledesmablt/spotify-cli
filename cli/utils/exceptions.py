@@ -13,8 +13,9 @@ class TokenExpired(ClickException):
         pass
 
 class SpotifyAPIError(ClickException):
-    def __init__(self, message):
-        self.message = 'Spotify API - ' + message
+    def __init__(self, message, status):
+        self.message = 'Spotify API - {} {}'.format(status, message)
+        self.status = status
         super().__init__(self.message)
 
 

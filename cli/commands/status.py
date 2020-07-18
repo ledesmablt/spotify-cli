@@ -8,7 +8,7 @@ from cli.utils.functions import format_duration_ms
 @click.command()
 @click.option('-v', '--verbose', count=True)
 @click.option('--raw', is_flag=True)
-def status(verbose=0, raw=False):
+def status(verbose=0, raw=False, override={}):
     res = Spotify.request('me/player', method='GET')
     if raw:
         if verbose >= 0:
@@ -59,6 +59,9 @@ def status(verbose=0, raw=False):
     music = data['music']
 
     # parsed
+    if override:
+        data.update(override)
+
     playback_status = 'Playing' if data['is_playing'] else 'Paused'
     playback_options = []
     if data['is_repeat']:
