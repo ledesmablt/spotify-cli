@@ -56,7 +56,7 @@ def devices(verbose=0, raw=False, switch_to=''):
             choices = devices_list
         else:
             click.echo('{} devices matched "{}".'.format(num_matched, switch_to))
-            message = 'Please select the device to activate below.\n'
+            message = 'Please select the device to activate.\n'
             choices = matched_devices
 
         choices = map(

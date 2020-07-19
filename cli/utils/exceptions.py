@@ -27,7 +27,7 @@ class NoPlaybackError(ClickException):
 
 class InvalidVolumeInput(ClickException):
     def __init__(self):
-        self.message = 'Please specify only one volume option.\nExample: spotify volume -u 15'
+        self.message = 'Please specify one volume option.\nExample: spotify volume -u 15'
         super().__init__(self.message)
 
 class DeviceOperationRestricted(ClickException):
