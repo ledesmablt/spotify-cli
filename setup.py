@@ -1,12 +1,10 @@
+import os
 from setuptools import setup, find_packages
 
-VERSION = '0.0.25'
+VERSION = os.environ['SPOTIFY_CLI_VERSION']
 
 with open('README.md', 'r') as f:
     long_description = f.read()
-
-with open('LICENSE', 'r') as f:
-    license = f.read()
 
 setup(
     name='spotify-cli',
@@ -17,7 +15,7 @@ setup(
     long_description=long_description,
     long_description_content_type='text/markdown',
     url='https://github.com/ledesmablt/spotify-cli',
-    license=license,
+    license='MIT',
 
     packages=find_packages(),
     install_requires=[
