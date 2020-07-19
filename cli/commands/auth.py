@@ -11,6 +11,7 @@ from cli.utils.constants import AUTH_URL, CREDS_PATH
 
 @click.command()
 def login():
+    """Authorize spotify-cli to access the Spotify API."""
     url = AUTH_URL + '&state=' + str(uuid1())
     try:
         import webbrowser
@@ -28,8 +29,12 @@ def login():
 
 
 @click.command()
-@click.option('-v', '--verbose', is_flag=True)
+@click.option(
+    '-v', '--verbose', is_flag=True,
+    help='Output more info (i.e. credential storage)'
+)
 def status(verbose):
+    """Show who's logged in."""
     user_data = Spotify.request('me', method='GET')
     click.echo('Logged in as {}'.format(user_data['display_name']))
     if verbose:
@@ -40,6 +45,7 @@ def status(verbose):
 # CLI group
 @click.group()
 def auth():
+    """Manage user authentication for spotify-cli."""
     pass
 
 auth.add_command(login)

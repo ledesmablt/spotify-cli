@@ -5,13 +5,26 @@ from cli.utils.exceptions import *
 
 
 @click.command()
-@click.option('-v', '--verbose', count=True)
-@click.option('--raw', is_flag=True)
-@click.option('-s', '--switch-to', type=str)
-def devices(verbose=0, raw=False, switch_to=''):
+@click.option(
+    '-v', '--verbose', is_flag=True,
+    help='Output more info.'
+)
+@click.option(
+    '-s', '--switch-to', type=str,
+    help='Change the currently active device.'
+)
+@click.option(
+    '--raw', is_flag=True,
+    help='Output raw API response.'
+)
+def devices(verbose=False, switch_to='', raw=False):
+    """Manage active devices.
+
+    Only devices with an active Spotify session will be recognized.
+    """
     res = Spotify.request('me/player/devices', method='GET')
     if raw:
-        if verbose >= 0:
+        if verbose:
             click.echo(res)
 
         return res

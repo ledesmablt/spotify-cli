@@ -6,9 +6,16 @@ from cli.utils.functions import format_duration_ms
 
 
 @click.command()
-@click.option('-v', '--verbose', count=True)
-@click.option('--raw', is_flag=True)
+@click.option(
+    '-v', '--verbose', count=True,
+    help='Output more info (repeatable flag).'
+)
+@click.option(
+    '--raw', is_flag=True,
+    help='Output raw API response.'
+)
 def status(verbose=0, raw=False, override={}):
+    """Display info about the current playback session."""
     res = Spotify.request('me/player', method='GET')
     if raw:
         if verbose >= 0:

@@ -5,10 +5,20 @@ from cli.utils.exceptions import *
 
 
 @click.command()
-@click.option('-u', '--up', type=int, default=0)
-@click.option('-d', '--down', type=int, default=0)
-@click.option('-t', '--to', type=int, default=0)
+@click.option(
+    '-u', '--up', type=int, default=0,
+    help='Increment volume up by [OPTION] percent.'
+)
+@click.option(
+    '-d', '--down', type=int, default=0,
+    help='Increment volume down by [OPTION] percent.'
+)
+@click.option(
+    '-t', '--to', type=int, default=0,
+    help='Set volume to [OPTION] percent.'
+)
 def volume(up, down, to):
+    """Control the active device's volume level."""
     num_options = (bool(up) + bool(down) + bool(to))
     if num_options != 1:
         raise InvalidVolumeInput
