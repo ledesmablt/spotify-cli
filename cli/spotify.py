@@ -14,6 +14,7 @@ from cli.commands.volume import volume
 
 # CLI group
 @click.command(cls=AliasedGroup)
+@click.version_option(message='spotify-cli, version %(version)s')
 def cli():
     pass
 
