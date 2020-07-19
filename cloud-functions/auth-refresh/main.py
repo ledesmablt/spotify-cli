@@ -2,12 +2,15 @@ import json
 import requests
 from flask import jsonify
 
+
 REFRESH_URL = 'https://accounts.spotify.com/api/token'
 REDIRECT_URI = 'https://asia-east2-spotify-cli-283006.cloudfunctions.net/auth-redirect'
 with open('credentials.json') as f:
     CREDENTIALS = json.load(f)
 
+
 def main(request):
+    """Handler for refreshing the user access token."""
     request_data = request.get_json()
     auth_code = request_data.get('auth_code')
     refresh_token = request_data.get('refresh_token')
