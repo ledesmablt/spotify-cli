@@ -31,10 +31,10 @@ Commands:
   auth      Manage user authentication for spotify-cli.
   devices   Manage active devices.
   next      Play the next song in the queue.
-  pause     Pause current playback.
-  play      Resume current playback.
+  pause     Pause playback.
+  play      Resume playback.
   previous  Play the previous song in the queue.
-  status    Display info about the current playback session.
+  status    Describe the current playback session.
   volume    Control the active device's volume level.
 ```
 

@@ -14,7 +14,7 @@ from cli.utils.exceptions import SpotifyAPIError
     help='Suppress output.'
 )
 def play(verbose=0, quiet=False):
-    """Resume current playback."""
+    """Resume playback."""
     try:
         Spotify.request('me/player/play', method='PUT')
     except SpotifyAPIError as e:
