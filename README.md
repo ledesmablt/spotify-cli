@@ -11,7 +11,7 @@ pip3 install spotify-cli
 
 ## Usage
 
-This CLI performs all interactions through the Spotify API. No need for a Spotify client to be installed on your device — all you need is a stable internet connection.
+This CLI performs all interactions through the Spotify API. All you need is a stable internet connection and an active Spotify session on any device.
 
 Authorize the CLI & save your credentials locally.
 ```
@@ -62,8 +62,7 @@ Volume set to 80%
 Volume set to 100%
 ```
 
-You can also manage multiple devices.  
-*Note: Some operations may not be supported on certain devices.*
+You can also manage multiple devices.
 ```
 ❯ spotify devices -v
   LENOVO - Computer
@@ -97,8 +96,12 @@ spotify p
 ```
 
 ## Notes
+- Playback and device-related commands require at least one active Spotify session on any device.
+  - You can just start and stop playback to "activate" your device.
+  - Your device will remain "active" even when paused.
+- Some operations may not be supported on certain devices (i.e. volume control for mobile).
 - Behavior may differ for users not subscribed to Spotify Premium.
-- In development: search, browse, and more playback options.
+- In development: search, browse, more playback options, custom auth scopes.
 
 ## [License](LICENSE)
 
