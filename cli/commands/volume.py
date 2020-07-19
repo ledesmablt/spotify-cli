@@ -1,7 +1,7 @@
 import click
 
 from cli.utils import Spotify
-from cli.utils.exceptions import InvalidVolumeInput
+from cli.utils.exceptions import *
 
 
 @click.command()
@@ -26,6 +26,17 @@ def volume(up, down, to):
             new_volume = 0
 
 
-    Spotify.request('me/player/volume?volume_percent={}'.format(new_volume), method='PUT')
+    try:
+        Spotify.request(
+            'me/player/volume?volume_percent={}'.format(new_volume),
+            method='PUT'
+        )
+    except SpotifyAPIError as e:
+        if e.status == 403:
+            raise DeviceOperationRestricted
+        else:
+            raise e
+
+
     click.echo('Volume set to {}%'.format(new_volume))
     return

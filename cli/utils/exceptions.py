@@ -30,6 +30,13 @@ class InvalidVolumeInput(ClickException):
         self.message = 'Please specify only one volume option.\nExample: spotify volume -u 15'
         super().__init__(self.message)
 
+class DeviceOperationRestricted(ClickException):
+    def __init__(self):
+        self.message = 'Operation restricted for the active device.'
+        super().__init__(self.message)
+
+
+# misc
 class PodcastNotSupported(ClickException):
     def __init__(self):
         self.message = 'Podcasts are currently not supported. This feature is in development.'
