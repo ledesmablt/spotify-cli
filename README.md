@@ -64,12 +64,12 @@ Volume set to 100%
 
 You can also manage multiple devices.
 ```
-❯ spotify devices -v
+> spotify devices -v
   LENOVO - Computer
 * Lorenzo - Smartphone
   Web Player (Chrome) - Computer
 
-❯ spotify devices --switch comp
+> spotify devices --switch comp
 2 devices matched "comp".
 ? Please select the device to activate.
  > LENOVO - Computer
@@ -95,12 +95,24 @@ spotify prev
 spotify p
 ```
 
+Some commands support the `--raw` flag to output the Spotify API JSON response (shell script-friendly).
+```bash
+> spotify status --raw | jq --jsonargs .context
+{
+  "external_urls": {
+    "spotify": "https://open.spotify.com/album/3mH6qwIy9crq0I9YQbOuDf"
+  },
+  "href": "https://api.spotify.com/v1/albums/3mH6qwIy9crq0I9YQbOuDf",
+  "type": "album",
+  "uri": "spotify:album:3mH6qwIy9crq0I9YQbOuDf"
+}
+```
+
 ## Notes
 - Playback and device-related commands require at least one active Spotify session on any device.
   - You can just start and stop playback to "activate" your device.
   - Your device will remain "active" even when paused.
-- Some operations may not be supported on certain devices (i.e. volume control for mobile).
-- Behavior may differ for users not subscribed to Spotify Premium.
+- Some operations may not be supported on certain devices (i.e. volume control for mobile) and for users not subscribed to Spotify Premium.
 - In development: search, browse, more playback options, custom auth scopes.
 
 ## [License](LICENSE)

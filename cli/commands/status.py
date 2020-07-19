@@ -19,7 +19,8 @@ def status(verbose=0, raw=False, override={}):
     res = Spotify.request('me/player', method='GET')
     if raw:
         if verbose >= 0:
-            click.echo(res)
+            import json
+            click.echo(json.dumps(res))
 
         return res
 

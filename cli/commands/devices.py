@@ -26,7 +26,8 @@ def devices(verbose=False, switch_to='', raw=False):
     res = Spotify.request('me/player/devices', method='GET')
     if raw:
         if verbose:
-            click.echo(res)
+            import json
+            click.echo(json.dumps(res))
 
         return res
 
