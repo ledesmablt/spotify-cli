@@ -43,7 +43,10 @@ def status(verbose):
 
 
 # CLI group
-@click.group()
+@click.group(
+    options_metavar='[<options>]',
+    subcommand_metavar='<command>'
+)
 def auth():
     """Manage user authentication for spotify-cli."""
     pass

@@ -21,21 +21,21 @@ spotify auth login
 Start Spotify playback on any device and run the `spotify` command.
 ```
 > spotify
-Usage: spotify [OPTIONS] COMMAND [ARGS]...
+Usage: spotify [<options>] <command>
 
 Options:
   --version  Show the version and exit.
   --help     Show this message and exit.
 
 Commands:
-  auth
-  devices
-  next
-  pause
-  play
-  previous
-  status
-  volume
+  auth      Manage user authentication for spotify-cli.
+  devices   Manage active devices.
+  next      Play the next song in the queue.
+  pause     Pause current playback.
+  play      Resume current playback.
+  previous  Play the previous song in the queue.
+  status    Display info about the current playback session.
+  volume    Control the active device's volume level.
 ```
 
 ## Examples

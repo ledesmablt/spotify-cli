@@ -13,7 +13,11 @@ from cli.commands.volume import volume
 
 
 # CLI group
-@click.command(cls=AliasedGroup)
+@click.command(
+    cls=AliasedGroup,
+    options_metavar='[<options>]',
+    subcommand_metavar='<command>'
+)
 @click.version_option(message='spotify-cli, version %(version)s')
 def cli():
     pass

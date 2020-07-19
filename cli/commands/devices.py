@@ -4,14 +4,15 @@ from cli.utils import Spotify
 from cli.utils.exceptions import *
 
 
-@click.command()
+@click.command(options_metavar='[<options>]')
 @click.option(
     '-v', '--verbose', is_flag=True,
     help='Output more info.'
 )
 @click.option(
     '-s', '--switch-to', type=str,
-    help='Change the currently active device.'
+    help='Change the currently active device.',
+    metavar='<name>'
 )
 @click.option(
     '--raw', is_flag=True,

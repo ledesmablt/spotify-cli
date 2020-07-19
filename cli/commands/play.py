@@ -4,7 +4,7 @@ from cli.utils import Spotify
 from cli.utils.exceptions import SpotifyAPIError
 
 
-@click.command()
+@click.command(options_metavar='[<options>]')
 @click.option(
     '-v', '--verbose', count=True,
     help='Output more info (repeatable flag).'

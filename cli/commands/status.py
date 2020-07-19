@@ -5,7 +5,7 @@ from cli.utils.exceptions import *
 from cli.utils.functions import format_duration_ms
 
 
-@click.command()
+@click.command(options_metavar='[<options>]')
 @click.option(
     '-v', '--verbose', count=True,
     help='Output more info (repeatable flag).'

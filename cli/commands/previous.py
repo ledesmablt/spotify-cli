@@ -3,7 +3,7 @@ import click
 from cli.utils import Spotify
 
 
-@click.command()
+@click.command(options_metavar='[<options>]')
 @click.option(
     '-v', '--verbose', count=True,
     help='Output more info (repeatable flag).'
