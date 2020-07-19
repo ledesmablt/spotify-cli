@@ -1,49 +1,106 @@
-# spotify-cli
-*Control Spotify playback on any device through the command line!*
+# Spotify CLI 🎧
 
+Control Spotify playback on any device through the command line.
 
-## architecture
-- cloud functions
-	- auth login (w/ portal)
-		- finish / fail - redirect to github
-	- auth refresh
+## Installation
 
-- Spotify handler
-	- manage auth
-		- access & refresh
-		- [optional] additional auth scopes (i.e. playlists, etc)
-	- handle API requests (w/ auth)
-	- search handler (class - stateful)
-			- list results (can be non-interactive)
-			- some sort of UI for going through search results (1-5, next/prev)
-					- could use [PyInquirer](https://github.com/CITGuru/PyInquirer)
-			- support for playlists, albums, etc
+This package only supports Python 3 and above.
+```
+pip3 install spotify-cli
+```
 
-- cli
-	- 100% API
-	- commands
-		- auth
-			- status [default]
-				- who's logged in, where file is saved
-			- login
-			- refresh ?
-				- helper function
-		- status
-			- current song, album, device, etc
-		- browse
-			- open current album in browser
-		- playback (actual commands below)
-			- play, pause, next, prev/back, shuffle
-		- ls/list
-			- current album
-		- search
-			- interactive
-			- specify --song, --album, --artist, --playlist, etc
+## Usage
 
-## nice to haves
-- pretty printing
-- docs
-- emojis
+This CLI performs all interactions through the Spotify API. No need for a Spotify client to be installed on your device — all you need is a stable internet connection.
 
-## references
-- [py cli](https://medium.com/@isaac.d.adams/creating-a-cli-with-python-and-node-js-631dfaf6a879)
+Authorize the CLI & save your credentials locally.
+```
+spotify auth login
+```
+
+Start Spotify playback on any device and run the `spotify` command.
+```
+> spotify
+Usage: spotify [OPTIONS] COMMAND [ARGS]...
+
+Options:
+  --version  Show the version and exit.
+  --help     Show this message and exit.
+
+Commands:
+  auth
+  devices
+  next
+  pause
+  play
+  previous
+  status
+  volume
+```
+
+## Examples
+
+Describe and control current playback.
+```
+> spotify play
+Playing: Nights
+         Frank Ocean - Blonde
+
+> spotify status -vv
+Song    Nights (03:31 / 05:07)
+Artist  Frank Ocean
+Album   Blonde
+Status  Playing (on repeat, 60% volume)
+
+Device  Lorenzo (Smartphone)
+URL:    https://open.spotify.com/track/7eqoqGkKwgOaWNNHx90uEZ
+
+> spotify vol --up 20
+Volume set to 80%
+
+> spotify vol --to 100
+Volume set to 100%
+```
+
+You can also manage multiple devices.  
+*Note: Some operations may not be supported on certain devices.*
+```
+❯ spotify devices -v
+  LENOVO - Computer
+* Lorenzo - Smartphone
+  Web Player (Chrome) - Computer
+
+❯ spotify devices --switch comp
+2 devices matched "comp".
+? Please select the device to activate.
+ > LENOVO - Computer
+   Web Player (Chrome) - Computer
+
+Switched to LENOVO - Computer
+```
+
+Command shortcut prefixes are supported.
+```bash
+# supported
+spotify volume
+spotify vol
+spotify v
+
+spotify next
+spotify n
+
+spotify previous
+spotify prev
+
+# not supported - too many matches (pause, play, previous)
+spotify p
+```
+
+## Notes
+- Behavior may differ for users not subscribed to Spotify Premium.
+- In development: search, browse, and more playback options.
+
+## [License](LICENSE)
+
+The MIT License (MIT)  
+Copyright (c) 2020 Benj Ledesma
