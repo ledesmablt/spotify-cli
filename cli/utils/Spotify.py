@@ -7,15 +7,19 @@ from cli.utils.constants import *
 from cli.utils.exceptions import *
 
 
+def _read_json(file_path):
+    if not os.path.exists(file_path):
+        return {}
+    with open(file_path) as f:
+        data = json.load(f)
+    return data
+
 def get_credentials():
     """Read locally stored credentials file for API authorization."""
-    if not os.path.exists(CREDS_PATH):
-        return {}
+    return _read_json(CREDS_PATH)
 
-    with open(CREDS_PATH) as f:
-        creds = json.load(f)
-
-    return creds
+def get_config():
+    return _read_json(CONFIG_PATH)
 
 
 def refresh(auth_code=None):
