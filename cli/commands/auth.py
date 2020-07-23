@@ -15,26 +15,46 @@ def login():
     # select scopes
     import webbrowser
     from PyInquirer import prompt
-    choices = filter(lambda x: x['value'] != 'default', AUTH_SCOPES_MAPPING)
+    enabled_scopes = Spotify.get_config().get('auth_scopes', [])
+    choices = list(filter(lambda x: x['value'] != 'default', AUTH_SCOPES_MAPPING))
+    for c in choices:
+        if c['value'] in enabled_scopes:
+            c['name'] = '(enabled) ' + c['name']
+
     click.echo('By default, spotify-cli will enable reading & modifying the playback state.\n')
-    questions = [{
+    choice = prompt([{
         'type': 'checkbox',
         'name': 'scopes',
         'message': 'Please select which additional features you want to authorize.',
         'choices': choices,
-    }]
-    choice = prompt(questions)
-    additional_scopes = choice.get('scopes')
-    url = build_auth_url(additional_scopes)
+    }])
+    if not choice:
+        return
+
+    # confirm
+    additional_scopes = choice.get('scopes', [])
+    click.echo(
+        '\n{} features selected. This will overwite your existing credentials.'
+        .format(len(additional_scopes))
+    )
+    confirmation = prompt([{
+        'type': 'confirm',
+        'name': 'confirm',
+        'message': 'Proceed with these settings?',
+    }])
+    if not confirmation.get('confirm', False):
+        click.echo('Cancelled by user')
+        return
 
     # handle auth and save credentials
+    url = build_auth_url(additional_scopes)
     webbrowser.open(url)
-    print('\nGo to the following link in your browser:\n\n\t{}\n'.format(url))
+    click.echo('\nGo to the following link in your browser:\n\n\t{}\n'.format(url))
     auth_code = input('Enter verification code: ')
-    print('\nObtaining access token...')
+    click.echo('\nObtaining access token...')
     Spotify.refresh(auth_code)
-    print('Credentials saved to {}'.format(CREDS_PATH))
-
+    Spotify.update_config({'auth_scopes': additional_scopes})
+    click.echo('Credentials saved to {}'.format(CREDS_PATH))
     return
 
 

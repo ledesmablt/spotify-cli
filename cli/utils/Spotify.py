@@ -21,6 +21,13 @@ def get_credentials():
 def get_config():
     return _read_json(CONFIG_PATH)
 
+def update_config(update_dict):
+    config = get_config()
+    config.update(update_dict)
+    with open(CONFIG_PATH, 'w+') as f:
+        json.dump(config, f)
+    return
+
 
 def refresh(auth_code=None):
     """Refresh Spotify access token.
