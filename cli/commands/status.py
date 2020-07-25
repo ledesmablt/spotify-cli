@@ -34,7 +34,7 @@ def status(verbose=0, raw=False, override={}):
         raise PodcastNotSupported
 
     data['is_shuffle'] = res['shuffle_state']
-    data['is_repeat'] = False if res['repeat_state'] == 'off' else res['repeat_state']
+    data['repeat_state'] = res['repeat_state']
     data['is_playing'] = res['is_playing']
     data['device'] = {
         'name': res['device']['name'],
@@ -72,8 +72,11 @@ def status(verbose=0, raw=False, override={}):
 
     playback_status = 'Playing' if data['is_playing'] else 'Paused'
     playback_options = []
-    if data['is_repeat']:
+    if data['repeat_state'] == 'track':
+        playback_options.append('repeat [track]')
+    elif data['repeat_state'] == 'context':
         playback_options.append('repeat')
+
     if data['is_shuffle']:
         playback_options.append('shuffle')
     playback_str = ''
