@@ -91,7 +91,11 @@ def _handle_request(endpoint, method='GET', data=None, headers={}, ignore_errs=[
                 if type(res_str) == bytes:
                     res_str = res_str.decode('utf-8')
 
-                return json.loads(res_str)
+                if len(res_str) == 0:
+                    return {}
+                else:
+                    return json.loads(res_str)
+
             elif res.status == 204:
                 return {}
 
