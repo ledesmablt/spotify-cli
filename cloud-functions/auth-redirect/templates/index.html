@@ -1,7 +1,7 @@
 <html>
 <head>
 	<title>Success code={{ authorization_code }}</title>
-	<link rel="stylesheet" type="text/css" href="index.css">
+	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
 	<link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
@@ -9,9 +9,9 @@
 		<h1>Here's the next step.</h1>
 		<p>Please copy this code, switch to your terminal and paste it there:</p>
 		<div class="code">
-			<p id="auth">{{ authorization_code }} LONG_EXAMPLE_CODE_TO_COPY___AQC6TB8EK-Z27-RH0h9fCwa8UcjJrGmtQwt7VC7ZpX2W4EHBqzV7IzRaej3UShYo63o-vo_IQNxGxUXnn_yCeR3-KdR-C_hEHnKS40H0Tgqs_E4vEFkBTt7t35NMgo_UFjB7OqwUy6SPuu4E7XdDTzZvEC4yemtMFV0Y24JLVHN4DQPlM19f0QM3D991YiCxXyaIQ0a52I2p8fuJmCC1bHCwAWS9ZzNQ9ABauVqlB6dCVL-dKoTtr634jeHp6BKC17XcdItHfzRCABNh3QPM5mImMX8YY9J0R_gTXn7LCVWHS7TGNDwZ5TBQbC4MQKcps47y5340eAeF3I54C5ogZKlNPu0Dbrl3pvw8cRvmBqC1oLJt-</p>
+			<p id="auth">{{ authorization_code }}</p>
 		</div>
 	</div>
-	<a href="http://github.com/ledesmablt" id="github">github.com/ledesmablt</a>
+	<a href="https://github.com/ledesmablt/spotify-cli" id="github">Spotify CLI by ledesmablt</a>
 </body>
 </html>
