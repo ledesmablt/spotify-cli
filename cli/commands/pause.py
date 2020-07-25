@@ -1,7 +1,6 @@
 import click
 
 from cli.utils import Spotify
-from cli.utils.exceptions import SpotifyAPIError
 
 
 @click.command(options_metavar='[<options>]')
