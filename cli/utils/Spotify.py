@@ -105,13 +105,11 @@ def _handle_request(endpoint, method='GET', data=None, headers={}, ignore_errs=[
             pass
         elif handle_errs.get(e.status):
             _exc = handle_errs[e.status]
-            if isinstance(_exc, Exception):
+            if type(_exc) not in [list, tuple]:
                 raise _exc
-            elif len(_exc) == 2:
+            else:
                 exc, kwargs = _exc
                 raise exc(**kwargs)
-            else:
-                raise Exception('Invalid input')
 
         elif e.status == 401:
             raise TokenExpired
