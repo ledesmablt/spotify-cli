@@ -15,7 +15,10 @@ from cli.utils.exceptions import NoPlaybackError
 )
 def previous(verbose=0, quiet=False):
     """Play the previous song in the queue."""
-    Spotify.request('me/player/previous', method='POST', handle_errs={404: NoPlaybackError})
+    Spotify.request(
+        'me/player/previous', method='POST',
+        handle_errs={404: NoPlaybackError}
+    )
     if not quiet:
         from cli.commands.status import status
         status.callback(verbose=verbose)

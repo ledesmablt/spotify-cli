@@ -41,7 +41,11 @@ def play(verbose=0, quiet=False, shuffle=None, repeat=None):
         verbose = max(verbose, 1)
 
     Spotify.multirequest(requests)
-    Spotify.request('me/player/play', method='PUT', ignore_errs=[403], handle_errs={404: NoPlaybackError})
+    Spotify.request(
+        'me/player/play', method='PUT',
+        ignore_errs=[403],
+        handle_errs={404: NoPlaybackError}
+    )
 
     if not quiet:
         from cli.commands.status import status

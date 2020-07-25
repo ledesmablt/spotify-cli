@@ -1,7 +1,7 @@
 import click
 
 from cli.utils import Spotify
-from cli.utils.exceptions import *
+from cli.utils.exceptions import NoPlaybackError
 
 
 @click.command(options_metavar='[<options>]')
@@ -24,15 +24,15 @@ def devices(verbose=False, switch_to='', raw=False):
     Only devices with an active Spotify session will be recognized.
     """
     res = Spotify.request('me/player/devices', method='GET')
+    if not res.get('devices'):
+        raise NoPlaybackError
+
     if raw:
         if verbose:
             import json
             click.echo(json.dumps(res))
 
         return res
-
-    if not res.get('devices'):
-        raise NoPlaybackError
 
     # parsed
     devices_list = sorted(

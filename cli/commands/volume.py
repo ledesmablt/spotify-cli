@@ -31,9 +31,6 @@ def volume(to, up, down):
     else:
         from cli.commands.status import status
         device = status.callback(raw=True, verbose=-1).get('device')
-        if not device:
-            raise NoPlaybackError
-
         current_volume = device['volume_percent']
         new_volume = current_volume + up - down
         if new_volume > 100:
