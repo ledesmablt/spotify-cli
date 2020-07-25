@@ -42,9 +42,18 @@ def status(verbose=0, raw=False, _override={}, _return_parsed=False):
         'volume': res['device']['volume_percent'],
     }
     item = res['item']
+    context = {'type': None}
+    if res['context']:
+        context = {
+            'type': res['context']['type'],
+            'id': res['context']['href'].split('/')[-1],
+            'url': res['context']['external_urls']['spotify'],
+            'api': res['context']['href'],
+        }
+
     data['music'] = {
         # note: playback context not available if private session or unnamed playlist
-        'context': res['context'],
+        'context': context,
         'track': {
             'name': item['name'],
             'id': item['id'],
@@ -62,9 +71,9 @@ def status(verbose=0, raw=False, _override={}, _return_parsed=False):
             'release_date': item['album']['release_date'],
         },
         'artist': {
-            'name': ', '.join([artist['name'] for artist in item['artists']]),
-            'id': [artist['id'] for artist in item['artists']],
-            'url': [artist['external_urls']['spotify'] for artist in item['artists']],
+            'names': [artist['name'] for artist in item['artists']],
+            'ids': [artist['id'] for artist in item['artists']],
+            'urls': [artist['external_urls']['spotify'] for artist in item['artists']],
         },
     }
     music = data['music']
@@ -72,6 +81,13 @@ def status(verbose=0, raw=False, _override={}, _return_parsed=False):
     # parsed
     if _override:
         data.update(_override)
+
+    # artist: name, id, url return first entry
+    for key in ['name', 'id', 'url']:
+        music['artist'][key] = music['artist'][key + 's'][0]
+        music['artist']['long_' + key] = ', '.join(music['artist'][key + 's'])
+        if key != 'name':
+            music['artist']['long_' + key] = music['artist']['long_' + key].replace(' ','')
 
     playback_status = 'Playing' if data['is_playing'] else 'Paused'
     playback_options = []
@@ -104,7 +120,7 @@ def status(verbose=0, raw=False, _override={}, _return_parsed=False):
                 playback_status,
                 ' ' if not data['is_playing'] else '',
                 music['track']['name'],
-                music['artist']['name'],
+                music['artist']['long_name'],
                 music['album']['name']
             )
         )
@@ -119,7 +135,7 @@ def status(verbose=0, raw=False, _override={}, _return_parsed=False):
                 music['track']['name'],
                 music['track']['progress'],
                 music['track']['duration'],
-                music['artist']['name'],
+                music['artist']['long_name'],
                 music['album']['name'],
                 playback_status,
                 playback_str
