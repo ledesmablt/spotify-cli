@@ -15,13 +15,7 @@ from cli.utils.exceptions import SpotifyAPIError
 )
 def pause(verbose=0, quiet=False):
     """Pause playback."""
-    try:
-        Spotify.request('me/player/pause', method='PUT')
-    except SpotifyAPIError as e:
-        if e.status == 403:
-            pass
-        else:
-            raise e
+    Spotify.request('me/player/pause', method='PUT', ignore_errs=[403])
 
     if not quiet:
         from cli.commands.status import status

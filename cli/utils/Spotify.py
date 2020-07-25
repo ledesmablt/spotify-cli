@@ -71,7 +71,7 @@ def refresh(auth_code=None):
     return refresh_data
 
 
-def _handle_request(endpoint, method='GET', data=None, headers={}):
+def _handle_request(endpoint, method='GET', data=None, headers={}, ignore_errs=[]):
     if endpoint.startswith('/'):
         endpoint = endpoint[1:]
 
@@ -96,13 +96,15 @@ def _handle_request(endpoint, method='GET', data=None, headers={}):
                 return {}
 
     except HTTPError as e:
-        if e.status == 401:
+        if e.status in ignore_errs:
+            pass
+        elif e.status == 401:
             raise TokenExpired
         else:
             raise SpotifyAPIError(message=e.msg, status=e.status)
 
 
-def request(endpoint, method='GET', data=None, headers=DEFAULT_HEADERS):
+def request(endpoint, method='GET', data=None, headers=DEFAULT_HEADERS, ignore_errs=[]):
     """Request wrapper for Spotify API endpoints. Handles errors, authorization,
     and refreshing access if needed.
     """
@@ -112,11 +114,22 @@ def request(endpoint, method='GET', data=None, headers=DEFAULT_HEADERS):
 
     headers['Authorization'] = 'Bearer ' + access_token
     try:
-        res_data = _handle_request(endpoint, method=method, data=data, headers=headers)
+        res_data = _handle_request(endpoint, method=method, data=data, headers=headers, ignore_errs=ignore_errs)
     except TokenExpired:
         # refresh & retry if expired
         access_token = refresh()['access_token']
         headers['Authorization'] = 'Bearer ' + access_token
-        res_data = _handle_request(endpoint, method=method, data=data, headers=headers)
+        res_data = _handle_request(endpoint, method=method, data=data, headers=headers, ignore_errs=ignore_errs)
 
     return res_data
+
+
+def multirequest(requests_arr=[], wait=False):
+    from concurrent.futures import ThreadPoolExecutor
+    executor = ThreadPoolExecutor(max_workers=5)
+    futures = [
+        executor.submit(request, **req)
+        for req in requests_arr
+    ]
+    executor.shutdown(wait=wait)
+    return futures
