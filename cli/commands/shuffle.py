@@ -15,13 +15,16 @@ from cli.utils import Spotify
 @click.argument(
     'mode', type=click.Choice(['on', 'off'], case_sensitive=False)
 )
-def shuffle(mode, verbose=0, quiet=False, wait=True):
+def shuffle(mode, verbose=0, quiet=False, _create_request=False):
     """Turn shuffle on or off."""
-    requests = [{
+    request = {
         'endpoint': 'me/player/shuffle?state={}'.format('true' if mode == 'on' else 'false'),
         'method': 'PUT'
-    }]
-    Spotify.multirequest(requests, wait=wait)
+    }
+    if _create_request:
+        return request
+
+    Spotify.request(**request)
     if quiet:
         return
 

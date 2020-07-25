@@ -15,18 +15,21 @@ from cli.utils import Spotify
 @click.argument(
     'mode', type=click.Choice(['all', 'track', 'off'], case_sensitive=False)
 )
-def repeat(mode, verbose=0, quiet=False, wait=True):
+def repeat(mode, verbose=0, quiet=False, _create_request=False):
     """Turn repeat on (all/track) or off."""
     state_map = {
         'all': 'context',
         'track': 'track',
         'off': 'off'
     }
-    requests = [{
+    request = {
         'endpoint': 'me/player/repeat?state={}'.format(state_map[mode]),
         'method': 'PUT'
-    }]
-    Spotify.multirequest(requests, wait=wait)
+    }
+    if _create_request:
+        return request
+
+    Spotify.request(**request)
     if quiet:
         return
 
