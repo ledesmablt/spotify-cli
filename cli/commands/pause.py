@@ -19,7 +19,7 @@ def pause(verbose=0, quiet=False):
 
     if not quiet:
         from cli.commands.status import status
-        status.callback(verbose=verbose, override={'is_playing': False})
+        status.callback(verbose=verbose, _override={'is_playing': False})
 
 
     return

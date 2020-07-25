@@ -44,6 +44,6 @@ def play(verbose=0, quiet=False, shuffle=None, repeat=None):
 
     if not quiet:
         from cli.commands.status import status
-        status.callback(verbose=verbose, override={'is_playing': True})
+        status.callback(verbose=verbose, _override={'is_playing': True})
 
     return

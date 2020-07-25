@@ -32,6 +32,6 @@ def shuffle(mode, verbose=0, quiet=False, _create_request=False):
         click.echo('Shuffle turned {}.'.format(mode))
     else:
         from cli.commands.status import status
-        status.callback(verbose=verbose, override={'is_shuffle': mode == 'on'})
+        status.callback(verbose=verbose, _override={'is_shuffle': mode == 'on'})
 
     return

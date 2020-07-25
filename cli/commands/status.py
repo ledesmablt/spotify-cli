@@ -14,7 +14,7 @@ from cli.utils.functions import format_duration_ms
     '--raw', is_flag=True,
     help='Output raw API response.'
 )
-def status(verbose=0, raw=False, override={}):
+def status(verbose=0, raw=False, _override={}):
     """Describe the current playback session."""
     res = Spotify.request('me/player', method='GET')
     if raw:
@@ -67,8 +67,8 @@ def status(verbose=0, raw=False, override={}):
     music = data['music']
 
     # parsed
-    if override:
-        data.update(override)
+    if _override:
+        data.update(_override)
 
     playback_status = 'Playing' if data['is_playing'] else 'Paused'
     playback_options = []

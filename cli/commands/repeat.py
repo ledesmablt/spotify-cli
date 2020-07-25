@@ -42,6 +42,6 @@ def repeat(mode, verbose=0, quiet=False, _create_request=False):
             click.echo('Repeat set to all tracks.')
     else:
         from cli.commands.status import status
-        status.callback(verbose=verbose, override={'is_repeat': mode in ['all', 'track']})
+        status.callback(verbose=verbose, _override={'is_repeat': mode in ['all', 'track']})
 
     return
