@@ -104,7 +104,15 @@ def _handle_request(endpoint, method='GET', data=None, headers={}, ignore_errs=[
         if e.status in ignore_errs:
             pass
         elif handle_errs.get(e.status):
-            raise handle_errs[e.status]
+            _exc = handle_errs[e.status]
+            if isinstance(_exc, Exception):
+                raise _exc
+            elif len(_exc) == 2:
+                exc, kwargs = _exc
+                raise exc(**kwargs)
+            else:
+                raise Exception('Invalid input')
+
         elif e.status == 401:
             raise TokenExpired
         else:
