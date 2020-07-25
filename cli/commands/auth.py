@@ -16,10 +16,14 @@ def login():
     import webbrowser
     from PyInquirer import prompt
     enabled_scopes = Spotify.get_config().get('auth_scopes', [])
-    choices = list(filter(lambda x: x['value'] != 'default', AUTH_SCOPES_MAPPING))
-    for c in choices:
-        if c['value'] in enabled_scopes:
-            c['name'] = '(enabled) ' + c['name']
+    choices = []
+    for scope in AUTH_SCOPES_MAPPING:
+        if scope['value'] == 'default':
+            continue
+        choices.append({
+            'name': scope['name'],
+            'checked': scope['name'] in enabled_scopes,
+        })
 
     click.echo('By default, spotify-cli will enable reading & modifying the playback state.\n')
     choice = prompt([{
