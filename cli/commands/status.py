@@ -14,7 +14,7 @@ from cli.utils.functions import format_duration_ms
     '--raw', is_flag=True,
     help='Output raw API response.'
 )
-def status(verbose=0, raw=False, _override={}):
+def status(verbose=0, raw=False, _override={}, _return_parsed=False):
     """Describe the current playback session."""
     res = Spotify.request('me/player', method='GET')
     if raw:
@@ -45,8 +45,9 @@ def status(verbose=0, raw=False, _override={}):
     data['music'] = {
         # note: playback context not available if private session or unnamed playlist
         'context': res['context'],
-        'song': {
+        'track': {
             'name': item['name'],
+            'id': item['id'],
             'url': item['external_urls']['spotify'],
             'api': item['href'],
             'track_number': item['track_number'],
@@ -55,13 +56,15 @@ def status(verbose=0, raw=False, _override={}):
         },
         'album': {
             'name': item['album']['name'],
+            'id': item['album']['id'],
             'url': item['album']['external_urls']['spotify'],
             'api': item['album']['href'],
             'release_date': item['album']['release_date'],
         },
         'artist': {
             'name': ', '.join([artist['name'] for artist in item['artists']]),
-            'urls': [artist['external_urls']['spotify'] for artist in item['artists']],
+            'id': [artist['id'] for artist in item['artists']],
+            'url': [artist['external_urls']['spotify'] for artist in item['artists']],
         },
     }
     music = data['music']
@@ -89,6 +92,9 @@ def status(verbose=0, raw=False, _override={}):
             playback_options_str, data['device']['volume']
         )
 
+    if _return_parsed:
+        return data
+
     # output
     if not verbose:
         click.echo(
@@ -97,7 +103,7 @@ def status(verbose=0, raw=False, _override={}):
             .format(
                 playback_status,
                 ' ' if not data['is_playing'] else '',
-                music['song']['name'],
+                music['track']['name'],
                 music['artist']['name'],
                 music['album']['name']
             )
@@ -105,14 +111,14 @@ def status(verbose=0, raw=False, _override={}):
 
     if verbose >= 1:
         click.echo(
-            'Song    {} ({} / {})\n'
+            'Track   {} ({} / {})\n'
             'Artist  {}\n'
             'Album   {}\n'
             'Status  {} {}'
             .format(
-                music['song']['name'],
-                music['song']['progress'],
-                music['song']['duration'],
+                music['track']['name'],
+                music['track']['progress'],
+                music['track']['duration'],
                 music['artist']['name'],
                 music['album']['name'],
                 playback_status,
@@ -128,7 +134,7 @@ def status(verbose=0, raw=False, _override={}):
             .format(
                 data['device']['name'],
                 data['device']['type'],
-                music['song']['url']
+                music['track']['url']
             )
         )
 
