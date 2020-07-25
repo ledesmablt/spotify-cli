@@ -17,7 +17,7 @@ from cli.utils import Spotify
     help='Suppress output.'
 )
 def save(save_type, verbose=0, quiet=False):
-    """Save the current track, album, artist, or playlist to your library."""
+    """Save the current track, album, artist, or playlist."""
     from cli.commands.status import status
     playback_data = status.callback(_return_parsed=True)
     music = playback_data['music']

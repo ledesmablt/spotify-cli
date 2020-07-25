@@ -20,7 +20,7 @@ spotify auth login
 
 Start Spotify playback on any device and run the `spotify` command.
 ```
-> spotify
+$ spotify
 Usage: spotify [<options>] <command>
 
 Options:
@@ -34,6 +34,9 @@ Commands:
   pause     Pause playback.
   play      Resume playback.
   previous  Play the previous song in the queue.
+  repeat    Turn repeat on (all/track) or off.
+  save      Save the current track, album, artist, or playlist.
+  shuffle   Turn shuffle on or off.
   status    Describe the current playback session.
   volume    Control the active device's volume level.
 ```
@@ -42,11 +45,11 @@ Commands:
 
 Describe and control current playback.
 ```
-> spotify play
+$ spotify play
 Playing: Nights
          Frank Ocean - Blonde
 
-> spotify status -vv
+$ spotify status -vv
 Song    Nights (03:31 / 05:07)
 Artist  Frank Ocean
 Album   Blonde
@@ -55,21 +58,21 @@ Status  Playing (on repeat, 60% volume)
 Device  Lorenzo (Smartphone)
 URL:    https://open.spotify.com/track/7eqoqGkKwgOaWNNHx90uEZ
 
-> spotify vol --up 20
+$ spotify vol --up 20
 Volume set to 80%
 
-> spotify vol --to 100
+$ spotify vol --to 100
 Volume set to 100%
 ```
 
 You can also manage multiple devices.
 ```
-> spotify devices -v
+$ spotify devices -v
   LENOVO - Computer
 * Lorenzo - Smartphone
   Web Player (Chrome) - Computer
 
-> spotify devices --switch comp
+$ spotify devices --switch comp
 2 devices matched "comp".
 ? Please select the device to activate.
  > LENOVO - Computer
@@ -97,7 +100,7 @@ spotify p
 
 Some commands support the `--raw` flag to output the Spotify API JSON response (shell script-friendly).
 ```bash
-> spotify status --raw | jq --jsonargs .context
+$ spotify status --raw | jq --jsonargs .context
 {
   "external_urls": {
     "spotify": "https://open.spotify.com/album/3mH6qwIy9crq0I9YQbOuDf"
