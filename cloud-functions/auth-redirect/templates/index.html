@@ -1,9 +1,17 @@
 <html>
 <head>
 	<title>Success code={{ authorization_code }}</title>
+	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
+	<link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
-	<p>Please copy this code, switch to your terminal and paste it there:</p>
-	<p>{{ authorization_code }}</p>
+	<div class="card">
+		<h1>Here's the next step.</h1>
+		<p>Please copy this code, switch to your terminal and paste it there:</p>
+		<div class="code">
+			<p id="auth">{{ authorization_code }}</p>
+		</div>
+	</div>
+	<a href="https://github.com/ledesmablt/spotify-cli" id="github">Spotify CLI by ledesmablt</a>
 </body>
 </html>
