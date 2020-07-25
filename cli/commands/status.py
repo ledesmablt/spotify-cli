@@ -14,12 +14,13 @@ from cli.utils.functions import format_duration_ms
     '--raw', is_flag=True,
     help='Output raw API response.'
 )
-def status(verbose=0, raw=False, override={}):
+def status(verbose=0, raw=False, _override={}, _return_parsed=False):
     """Describe the current playback session."""
     res = Spotify.request('me/player', method='GET')
     if raw:
         if verbose >= 0:
-            click.echo(res)
+            import json
+            click.echo(json.dumps(res))
 
         return res
 
@@ -33,7 +34,7 @@ def status(verbose=0, raw=False, override={}):
         raise PodcastNotSupported
 
     data['is_shuffle'] = res['shuffle_state']
-    data['is_repeat'] = False if res['repeat_state'] == 'off' else res['repeat_state']
+    data['repeat_state'] = res['repeat_state']
     data['is_playing'] = res['is_playing']
     data['device'] = {
         'name': res['device']['name'],
@@ -41,11 +42,21 @@ def status(verbose=0, raw=False, override={}):
         'volume': res['device']['volume_percent'],
     }
     item = res['item']
+    context = {'type': None}
+    if res['context']:
+        context = {
+            'type': res['context']['type'],
+            'id': res['context']['href'].split('/')[-1],
+            'url': res['context']['external_urls']['spotify'],
+            'api': res['context']['href'],
+        }
+
     data['music'] = {
         # note: playback context not available if private session or unnamed playlist
-        'context': res['context'],
-        'song': {
+        'context': context,
+        'track': {
             'name': item['name'],
+            'id': item['id'],
             'url': item['external_urls']['spotify'],
             'api': item['href'],
             'track_number': item['track_number'],
@@ -54,25 +65,37 @@ def status(verbose=0, raw=False, override={}):
         },
         'album': {
             'name': item['album']['name'],
+            'id': item['album']['id'],
             'url': item['album']['external_urls']['spotify'],
             'api': item['album']['href'],
             'release_date': item['album']['release_date'],
         },
         'artist': {
-            'name': ', '.join([artist['name'] for artist in item['artists']]),
+            'names': [artist['name'] for artist in item['artists']],
+            'ids': [artist['id'] for artist in item['artists']],
             'urls': [artist['external_urls']['spotify'] for artist in item['artists']],
         },
     }
     music = data['music']
 
     # parsed
-    if override:
-        data.update(override)
+    if _override:
+        data.update(_override)
+
+    # artist: name, id, url return first entry
+    for key in ['name', 'id', 'url']:
+        music['artist'][key] = music['artist'][key + 's'][0]
+        music['artist']['long_' + key] = ', '.join(music['artist'][key + 's'])
+        if key != 'name':
+            music['artist']['long_' + key] = music['artist']['long_' + key].replace(' ','')
 
     playback_status = 'Playing' if data['is_playing'] else 'Paused'
     playback_options = []
-    if data['is_repeat']:
+    if data['repeat_state'] == 'track':
+        playback_options.append('repeat [track]')
+    elif data['repeat_state'] == 'context':
         playback_options.append('repeat')
+
     if data['is_shuffle']:
         playback_options.append('shuffle')
     playback_str = ''
@@ -85,6 +108,9 @@ def status(verbose=0, raw=False, override={}):
             playback_options_str, data['device']['volume']
         )
 
+    if _return_parsed:
+        return data
+
     # output
     if not verbose:
         click.echo(
@@ -93,23 +119,23 @@ def status(verbose=0, raw=False, override={}):
             .format(
                 playback_status,
                 ' ' if not data['is_playing'] else '',
-                music['song']['name'],
-                music['artist']['name'],
+                music['track']['name'],
+                music['artist']['long_name'],
                 music['album']['name']
             )
         )
 
     if verbose >= 1:
         click.echo(
-            'Song    {} ({} / {})\n'
+            'Track   {} ({} / {})\n'
             'Artist  {}\n'
             'Album   {}\n'
             'Status  {} {}'
             .format(
-                music['song']['name'],
-                music['song']['progress'],
-                music['song']['duration'],
-                music['artist']['name'],
+                music['track']['name'],
+                music['track']['progress'],
+                music['track']['duration'],
+                music['artist']['long_name'],
                 music['album']['name'],
                 playback_status,
                 playback_str
@@ -124,7 +150,7 @@ def status(verbose=0, raw=False, override={}):
             .format(
                 data['device']['name'],
                 data['device']['type'],
-                music['song']['url']
+                music['track']['url']
             )
         )
 
