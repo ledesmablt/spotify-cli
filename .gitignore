@@ -2,6 +2,7 @@
 *.json
 *backup*
 *.sh
+*.txt
 todo
 
 
