@@ -12,6 +12,7 @@ from cli.commands.devices import devices
 from cli.commands.volume import volume
 from cli.commands.shuffle import shuffle
 from cli.commands.repeat import repeat
+from cli.commands.save import save
 
 
 # CLI group
@@ -35,3 +36,4 @@ cli.add_command(devices)
 cli.add_command(volume)
 cli.add_command(shuffle)
 cli.add_command(repeat)
+cli.add_command(save)
