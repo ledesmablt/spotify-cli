@@ -71,13 +71,14 @@ def refresh(auth_code=None):
     return refresh_data
 
 
-def _handle_request(endpoint, method='GET', data=None, headers={}, ignore_errs=[]):
+def _handle_request(endpoint, method='GET', data=None, headers={}, ignore_errs=[], handle_errs={}):
     if endpoint.startswith('/'):
         endpoint = endpoint[1:]
 
     if data:
         data = json.dumps(data).encode('ascii')
         
+    headers.update(DEFAULT_HEADERS)
     req = Request(
         API_URL + endpoint,
         data,
@@ -102,13 +103,15 @@ def _handle_request(endpoint, method='GET', data=None, headers={}, ignore_errs=[
     except HTTPError as e:
         if e.status in ignore_errs:
             pass
+        elif handle_errs.get(e.status):
+            raise handle_errs[e.status]
         elif e.status == 401:
             raise TokenExpired
         else:
             raise SpotifyAPIError(message=e.msg, status=e.status)
 
 
-def request(endpoint, method='GET', data=None, headers=DEFAULT_HEADERS, ignore_errs=[]):
+def request(endpoint, *args, **kwargs):
     """Request wrapper for Spotify API endpoints. Handles errors, authorization,
     and refreshing access if needed.
     """
@@ -116,14 +119,15 @@ def request(endpoint, method='GET', data=None, headers=DEFAULT_HEADERS, ignore_e
     if not access_token:
         raise AuthorizationError
 
-    headers['Authorization'] = 'Bearer ' + access_token
+    kwargs['headers'] = kwargs.get('headers', {})
+    kwargs['headers']['Authorization'] = 'Bearer ' + access_token
     try:
-        res_data = _handle_request(endpoint, method=method, data=data, headers=headers, ignore_errs=ignore_errs)
+        res_data = _handle_request(endpoint, *args, **kwargs)
     except TokenExpired:
         # refresh & retry if expired
         access_token = refresh()['access_token']
-        headers['Authorization'] = 'Bearer ' + access_token
-        res_data = _handle_request(endpoint, method=method, data=data, headers=headers, ignore_errs=ignore_errs)
+        kwargs['headers']['Authorization'] = 'Bearer ' + access_token
+        res_data = _handle_request(endpoint, *args, **kwargs)
 
     return res_data
 

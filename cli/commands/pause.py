@@ -1,6 +1,7 @@
 import click
 
 from cli.utils import Spotify
+from cli.utils.exceptions import NoPlaybackError
 
 
 @click.command(options_metavar='[<options>]')
@@ -14,7 +15,7 @@ from cli.utils import Spotify
 )
 def pause(verbose=0, quiet=False):
     """Pause playback."""
-    Spotify.request('me/player/pause', method='PUT', ignore_errs=[403])
+    Spotify.request('me/player/pause', method='PUT', ignore_errs=[403], handle_errs={404: NoPlaybackError})
 
     if not quiet:
         from cli.commands.status import status

@@ -31,7 +31,7 @@ def devices(verbose=False, switch_to='', raw=False):
 
         return res
 
-    if not res:
+    if not res.get('devices'):
         raise NoPlaybackError
 
     # parsed
