@@ -1,0 +1,58 @@
+body {
+    background-color: rgb(22, 22, 22);
+    font-family: 'Work Sans';
+    font-size: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 80vh;
+    margin: 0;
+}
+
+h1 {
+    font-size: 50px;
+    margin-bottom: -1rem;
+}
+
+a {
+    color: #FFF;
+  }
+
+a:visited {
+    color: #FFF;
+  }
+
+.card {
+    width: 40%;
+    height: 30rem;
+    background-color: rgb(255, 255, 255);
+    margin: auto;
+    padding: 2rem 5rem;
+    text-align: center;
+    border-radius: 15px;
+}
+
+.code {
+    letter-spacing: 0.1rem;
+    width: 80%;
+    height: 40%;
+    padding: 1rem;
+    background-color: #F9F9F9;
+    border-radius: 15px;
+    color: #1DB954;
+    font-size: 1rem;
+    line-height: 25px;
+    text-align: left;
+    overflow: scroll;
+    word-wrap: break-word;
+    overflow-x: hidden;
+}
+
+#auth {
+    margin: 0;
+}
+
+#github {
+    text-align: center;
+    font-size: 1rem;
+}
