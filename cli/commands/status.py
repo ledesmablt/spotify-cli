@@ -49,6 +49,7 @@ def status(verbose=0, raw=False, _override={}, _return_parsed=False):
             'id': res['context']['href'].split('/')[-1],
             'url': res['context']['external_urls']['spotify'],
             'api': res['context']['href'],
+            'uri': res['context']['uri'],
         }
 
     data['music'] = {
@@ -59,6 +60,7 @@ def status(verbose=0, raw=False, _override={}, _return_parsed=False):
             'id': item['id'],
             'url': item['external_urls']['spotify'],
             'api': item['href'],
+            'uri': item['uri'],
             'track_number': item['track_number'],
             'progress': format_duration_ms(res['progress_ms']),
             'duration': format_duration_ms(item['duration_ms']),
@@ -68,7 +70,9 @@ def status(verbose=0, raw=False, _override={}, _return_parsed=False):
             'id': item['album']['id'],
             'url': item['album']['external_urls']['spotify'],
             'api': item['album']['href'],
+            'uri': item['album']['uri'],
             'release_date': item['album']['release_date'],
+            'total_tracks': item['album']['total_tracks'],
         },
         'artist': {
             'names': [artist['name'] for artist in item['artists']],
