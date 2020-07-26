@@ -30,8 +30,8 @@ def volume(to, up, down):
         new_volume = to
     else:
         from cli.commands.status import status
-        raw_status = status.callback(raw=True, verbose=-1)
-        current_volume = raw_status['device']['volume_percent']
+        device = status.callback(raw=True, verbose=-1).get('device')
+        current_volume = device['volume_percent']
         new_volume = current_volume + up - down
         if new_volume > 100:
             new_volume = 100
@@ -39,17 +39,10 @@ def volume(to, up, down):
             new_volume = 0
 
 
-    try:
-        Spotify.request(
-            'me/player/volume?volume_percent={}'.format(new_volume),
-            method='PUT'
-        )
-    except SpotifyAPIError as e:
-        if e.status == 403:
-            raise DeviceOperationRestricted
-        else:
-            raise e
-
-
+    Spotify.request(
+        'me/player/volume?volume_percent={}'.format(new_volume),
+        method='PUT',
+        handle_errs={403: DeviceOperationRestricted}
+    )
     click.echo('Volume set to {}%'.format(new_volume))
     return

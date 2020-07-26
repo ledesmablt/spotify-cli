@@ -1,6 +1,7 @@
 import click
 
 from cli.utils import Spotify
+from cli.utils.exceptions import AuthScopeError
 
 
 @click.command(options_metavar='[<options>]')
@@ -39,7 +40,6 @@ def save(save_type, verbose=0, quiet=False):
 
     # format endpoint
     data = None
-    headers = {}
     if save_type in ['track', 'album']:
         endpoint = 'me/{}s?ids={}'.format(save_type, id_str)
         message = 'Saved {} - {} to library.'.format(save_type, name)
@@ -51,9 +51,13 @@ def save(save_type, verbose=0, quiet=False):
     elif save_type == 'playlist':
         endpoint = 'playlists/{}/followers'.format(id_str)
         message = 'Following {} - {}.'.format(save_type, name)
-        headers = {'Content-Type': 'application/json'}
         data = {'public': True}
 
-    Spotify.request(endpoint, method='PUT', data=data, headers=headers)
+    Spotify.request(
+        endpoint, method='PUT', data=data,
+        handle_errs={
+            403: (AuthScopeError, {'required_scope_key': 'user-modify'})
+        }
+    )
     click.echo(message)
     return

@@ -17,15 +17,15 @@ from cli.utils.functions import format_duration_ms
 def status(verbose=0, raw=False, _override={}, _return_parsed=False):
     """Describe the current playback session."""
     res = Spotify.request('me/player', method='GET')
+    if not res:
+        raise NoPlaybackError
+
     if raw:
         if verbose >= 0:
             import json
             click.echo(json.dumps(res))
 
         return res
-
-    if not res:
-        raise NoPlaybackError
 
     # raw
     data = {}

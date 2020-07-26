@@ -7,6 +7,26 @@ class AuthorizationError(ClickException):
         self.message = 'CLI not authenticated.\nPlease run the command - spotify auth login'
         super().__init__(self.message)
 
+class AuthScopeError(ClickException):
+    def __init__(self, required_scope_key):
+        from cli.utils.constants import AUTH_SCOPES_MAPPING
+        try:
+            required_scope_msg = next(filter(
+                lambda scope: scope['value'] == required_scope_key,
+                AUTH_SCOPES_MAPPING
+            ))['name']
+        except:
+            raise Exception('Scope key not found')
+
+        self.message = (
+            'Operation restricted for currently authorized scopes.\n'
+            'Please run the command - spotify auth login\n\n'
+            'Required scopes:\n'
+            '> {}'
+            .format(required_scope_msg)
+        )
+        super().__init__(self.message)
+
 class TokenExpired(ClickException):
     def __init__(self):
         """Signals a token refresh."""

@@ -1,6 +1,7 @@
 import click
 
 from cli.utils import Spotify
+from cli.utils.exceptions import NoPlaybackError
 
 
 @click.command(options_metavar='[<options>]')
@@ -14,7 +15,10 @@ from cli.utils import Spotify
 )
 def previous(verbose=0, quiet=False):
     """Play the previous song in the queue."""
-    Spotify.request('me/player/previous', method='POST')
+    Spotify.request(
+        'me/player/previous', method='POST',
+        handle_errs={404: NoPlaybackError}
+    )
     if not quiet:
         from cli.commands.status import status
         status.callback(verbose=verbose)

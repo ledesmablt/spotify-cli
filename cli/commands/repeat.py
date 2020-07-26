@@ -1,6 +1,7 @@
 import click
 
 from cli.utils import Spotify
+from cli.utils.exceptions import NoPlaybackError
 
 
 @click.command(options_metavar='[<options>]')
@@ -24,7 +25,8 @@ def repeat(mode, verbose=0, quiet=False, _create_request=False):
     }
     request = {
         'endpoint': 'me/player/repeat?state={}'.format(state_map[mode]),
-        'method': 'PUT'
+        'method': 'PUT',
+        'handle_errs': {404: NoPlaybackError},
     }
     if _create_request:
         return request

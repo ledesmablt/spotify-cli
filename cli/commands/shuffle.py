@@ -1,6 +1,7 @@
 import click
 
 from cli.utils import Spotify
+from cli.utils.exceptions import NoPlaybackError
 
 
 @click.command(options_metavar='[<options>]')
@@ -19,7 +20,8 @@ def shuffle(mode, verbose=0, quiet=False, _create_request=False):
     """Turn shuffle on or off."""
     request = {
         'endpoint': 'me/player/shuffle?state={}'.format('true' if mode == 'on' else 'false'),
-        'method': 'PUT'
+        'method': 'PUT',
+        'handle_errs': {404: NoPlaybackError},
     }
     if _create_request:
         return request
