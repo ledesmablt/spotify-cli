@@ -13,6 +13,7 @@ from cli.commands.volume import volume
 from cli.commands.shuffle import shuffle
 from cli.commands.repeat import repeat
 from cli.commands.save import save
+from cli.commands.queue import queue
 
 
 # CLI group
@@ -37,3 +38,4 @@ cli.add_command(volume)
 cli.add_command(shuffle)
 cli.add_command(repeat)
 cli.add_command(save)
+cli.add_command(queue)
