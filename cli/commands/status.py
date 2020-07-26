@@ -150,7 +150,7 @@ def status(verbose=0, raw=False, _override={}, _return_parsed=False):
         click.echo(
             '\n'
             'Device  {} ({})\n'
-            'URL:    {}'
+            'URL     {}'
             .format(
                 data['device']['name'],
                 data['device']['type'],
