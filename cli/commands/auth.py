@@ -41,14 +41,7 @@ def login():
         '\n{} features selected. This will overwite your existing credentials.'
         .format(len(additional_scopes))
     )
-    confirmation = prompt([{
-        'type': 'confirm',
-        'name': 'confirm',
-        'message': 'Proceed with these settings?',
-    }])
-    if not confirmation.get('confirm', False):
-        click.echo('Cancelled by user')
-        return
+    click.confirm('Proceed with these settings?', abort=True)
 
     # handle auth and save credentials
     url = build_auth_url(additional_scopes)
