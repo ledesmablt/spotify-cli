@@ -5,10 +5,22 @@ from cli.utils.exceptions import AuthScopeError
 
 
 @click.command(options_metavar='[<options>]')
-@click.option('--track', 'save_type', flag_value='track', default=True)
-@click.option('--album', 'save_type', flag_value='album')
-@click.option('--artist', 'save_type', flag_value='artist')
-@click.option('--playlist', 'save_type', flag_value='playlist')
+@click.option(
+    '--track', 'save_type', flag_value='track', default=True,
+    help='(default) Save the current track to your Liked Songs.'
+)
+@click.option(
+    '--album', 'save_type', flag_value='album',
+    help='Save the current album to your library.'
+)
+@click.option(
+    '--artist', 'save_type', flag_value='artist',
+    help='Follow the current artist.'
+)
+@click.option(
+    '--playlist', 'save_type', flag_value='playlist',
+    help='Follow the current playlist.'
+)
 @click.option(
     '-v', '--verbose', count=True,
     help='Output more info (repeatable flag).'
@@ -18,7 +30,10 @@ from cli.utils.exceptions import AuthScopeError
     help='Suppress output.'
 )
 def save(save_type, verbose=0, quiet=False):
-    """Save the current track, album, artist, or playlist."""
+    """Save the current track, album, artist, or playlist.
+
+    Specify one of the above options to change what to save (default: track).
+    """
     from cli.commands.status import status
     playback_data = status.callback(_return_parsed=True)
     music = playback_data['music']
