@@ -6,7 +6,7 @@ Control Spotify playback on any device through the command line.
 
 This package only supports Python 3 and above.
 ```
-pip3 install spotify-cli
+$ pip3 install spotify-cli
 ```
 
 ## Usage
@@ -15,7 +15,7 @@ This CLI performs all interactions through the Spotify API. All you need is a st
 
 Authorize the CLI & save your credentials locally.
 ```
-spotify auth login
+$ spotify auth login
 ```
 
 Start Spotify playback on any device and run the `spotify` command.
