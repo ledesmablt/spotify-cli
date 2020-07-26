@@ -4,7 +4,10 @@ from click import ClickException
 # auth
 class AuthorizationError(ClickException):
     def __init__(self):
-        self.message = 'CLI not authenticated.\nPlease run the command - spotify auth login'
+        self.message = (
+            'CLI not authenticated.\n'
+            'Please run the command - spotify auth login'
+        )
         super().__init__(self.message)
 
 class AuthScopeError(ClickException):
@@ -32,6 +35,8 @@ class TokenExpired(ClickException):
         """Signals a token refresh."""
         pass
 
+
+# api
 class SpotifyAPIError(ClickException):
     def __init__(self, message, status):
         self.message = 'Spotify API - {} {}'.format(status, message)
@@ -42,12 +47,18 @@ class SpotifyAPIError(ClickException):
 # playback
 class NoPlaybackError(ClickException):
     def __init__(self):
-        self.message = 'No playback session detected.\nPlease start Spotify on one of your devices.'
+        self.message = (
+            'No playback session detected.\n'
+            'Please start Spotify on one of your devices.'
+        )
         super().__init__(self.message)
 
 class InvalidVolumeInput(ClickException):
     def __init__(self):
-        self.message = 'Please specify one volume option.\nExample: spotify volume -u 15'
+        self.message = (
+            'Please specify one volume option.\n'
+            'Example: spotify volume -u 15'
+        )
         super().__init__(self.message)
 
 class DeviceOperationRestricted(ClickException):
@@ -57,7 +68,15 @@ class DeviceOperationRestricted(ClickException):
 
 
 # misc
+class FeatureInDevelopment(ClickException):
+    def __init__(self):
+        self.message = (
+            'This feature is currently in development.\n'
+            'Info: https://github.com/ledesmablt/spotify-cli'
+        )
+        super().__init__(self.message)
+
 class PodcastNotSupported(ClickException):
     def __init__(self):
-        self.message = 'Podcasts are currently not supported. This feature is in development.'
+        self.message = 'Podcasts are not supported.'
         super().__init__(self.message)
