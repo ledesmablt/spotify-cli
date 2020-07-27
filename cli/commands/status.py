@@ -1,8 +1,9 @@
 import click
 
 from cli.utils import Spotify
-from cli.utils.exceptions import *
+from cli.utils.parsers import *
 from cli.utils.functions import format_duration_ms
+from cli.utils.exceptions import *
 
 
 @click.command(options_metavar='[<options>]')
@@ -44,6 +45,7 @@ def status(verbose=0, raw=False, _override={}, _return_parsed=False):
     item = res['item']
     context = {'type': None}
     if res['context']:
+        # note: playback context not available if private session or unnamed playlist
         context = {
             'type': res['context']['type'],
             'id': res['context']['href'].split('/')[-1],
@@ -53,34 +55,13 @@ def status(verbose=0, raw=False, _override={}, _return_parsed=False):
         }
 
     data['music'] = {
-        # note: playback context not available if private session or unnamed playlist
         'context': context,
-        'track': {
-            'name': item['name'],
-            'id': item['id'],
-            'url': item['external_urls']['spotify'],
-            'api': item['href'],
-            'uri': item['uri'],
-            'track_number': item['track_number'],
-            'progress': format_duration_ms(res['progress_ms']),
-            'duration': format_duration_ms(item['duration_ms']),
-        },
-        'album': {
-            'name': item['album']['name'],
-            'id': item['album']['id'],
-            'url': item['album']['external_urls']['spotify'],
-            'api': item['album']['href'],
-            'uri': item['album']['uri'],
-            'release_date': item['album']['release_date'],
-            'total_tracks': item['album']['total_tracks'],
-        },
-        'artist': {
-            'names': [artist['name'] for artist in item['artists']],
-            'ids': [artist['id'] for artist in item['artists']],
-            'urls': [artist['external_urls']['spotify'] for artist in item['artists']],
-        },
+        'track': parse_track(item),
+        'album': parse_album(item['album']),
+        'artist': parse_artists(item['artists']),
     }
     music = data['music']
+    music['track']['progress'] = format_duration_ms(res['progress_ms'])
 
     # parsed
     if _override:
