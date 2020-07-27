@@ -80,3 +80,12 @@ class PodcastNotSupported(ClickException):
     def __init__(self):
         self.message = 'Podcasts are not supported.'
         super().__init__(self.message)
+
+
+class PagerLimitReached(Exception):
+    """Results limit reached."""
+    pass
+
+class PagerPreviousUnavailable(Exception):
+    """Previous page not available."""
+    pass

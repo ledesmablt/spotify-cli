@@ -75,16 +75,17 @@ def _handle_request(endpoint, method='GET', data=None, headers={}, ignore_errs=[
     if endpoint.startswith('/'):
         endpoint = endpoint[1:]
 
+    # allow full URL to be passed
+    if endpoint.startswith(API_URL):
+        url = endpoint
+    else:
+        url = API_URL + endpoint
+
     if data:
         data = json.dumps(data).encode('ascii')
         
     headers.update(DEFAULT_HEADERS)
-    req = Request(
-        API_URL + endpoint,
-        data,
-        headers,
-        method=method
-    )
+    req = Request(url, data, headers, method=method)
     try:
         with urlopen(req) as res:
             if res.status == 200:
@@ -147,3 +148,44 @@ def multirequest(requests_arr=[], wait=False):
     ]
     executor.shutdown(wait=wait)
     return futures
+
+
+class Pager:
+    def __init__(self, endpoint, limit=20, offset=0, result_type='', *args, **kwargs):
+        self.endpoint = endpoint
+        self.result_type = result_type
+        self._args = args
+        self._kwargs = kwargs
+        self._endpoint_formatted = endpoint + '?limit={}&offset={}'.format(limit, offset)
+
+        self.content = request(self._endpoint_formatted, *args, **kwargs)
+        self._update_from_content()
+        return
+
+    def _update_from_content(self):
+        self.items = self.content['items']
+        self.next_url = self.content['next']
+        self.previous_url = self.content.get('previous')
+        self.total = self.content.get('total')
+        self.limit = self.content['limit']
+        self.offset = self.content.get('offset')    # index of first result
+
+        # computed
+        self.offset_end = self.offset + min(len(self.items), self.limit) - 1
+        return
+
+    def next(self):
+        if not self.items or not self.next_url:
+            raise PagerLimitReached
+
+        self.content = request(self.next_url, *self._args, **self._kwargs)
+        self._update_from_content()
+        return
+
+    def previous(self):
+        if not self.previous_url:
+            raise PagerPreviousUnavailable
+
+        self.content = request(self.previous_url, *self._args, **self._kwargs)
+        self._update_from_content()
+        return
