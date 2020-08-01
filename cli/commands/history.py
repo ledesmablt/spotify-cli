@@ -2,6 +2,7 @@ import click
 
 from cli.utils import Spotify
 from cli.utils.parsers import *
+from cli.utils.functions import cut_string
 from cli.utils.exceptions import *
 
 
@@ -34,8 +35,8 @@ def history(verbose=0, raw=False, limit=10, _return_parsed=False):
     for item in pager.content['items']:
         parsed_item = parse_track_item_full(item['track'])
         table.append([
-            ', '.join(parsed_item['artists']['names']),
-            parsed_item['track']['name'],
+            cut_string(', '.join(parsed_item['artists']['names']), 30),
+            cut_string(parsed_item['track']['name'], 50),
         ])
 
     if len(table) == 0:

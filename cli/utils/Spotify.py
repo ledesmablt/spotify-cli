@@ -152,6 +152,7 @@ def multirequest(requests_arr=[], wait=False):
 
 class Pager:
     def __init__(self, endpoint, limit=20, offset=0, result_type='', *args, **kwargs):
+        limit = min(50, limit)
         self.endpoint = endpoint
         self.result_type = result_type
         self._args = args

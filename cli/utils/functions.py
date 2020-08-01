@@ -38,3 +38,10 @@ def build_auth_url(additional_scopes=[]):
         )
     )
     return auth_url
+
+
+def cut_string(string, limit=30):
+    if len(string) <= limit:
+        return string
+    else:
+        return string[:limit-3] + '...'
