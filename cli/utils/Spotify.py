@@ -169,9 +169,6 @@ class Pager:
         self.total = self.content.get('total')
         self.limit = self.content['limit']
         self.offset = self.content.get('offset')    # index of first result
-
-        # computed
-        self.offset_end = self.offset + min(len(self.items), self.limit) - 1
         return
 
     def next(self):
