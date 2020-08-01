@@ -15,6 +15,7 @@ from cli.commands.repeat import repeat
 from cli.commands.save import save
 from cli.commands.queue import queue
 from cli.commands.browse import browse
+from cli.commands.history import history
 
 
 # CLI group
@@ -41,3 +42,4 @@ cli.add_command(repeat)
 cli.add_command(save)
 cli.add_command(queue)
 cli.add_command(browse)
+cli.add_command(history)

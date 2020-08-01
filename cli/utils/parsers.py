@@ -30,3 +30,10 @@ def parse_artists(artists):
         'ids': [a['id'] for a in artists],
         'urls': [a['external_urls']['spotify'] for a in artists],
     }
+
+def parse_track_item_full(item):
+    return {
+        'track': parse_track(item),
+        'album': parse_album(item['album']),
+        'artists': parse_artists(item['artists']),
+    }
