@@ -151,13 +151,16 @@ def multirequest(requests_arr=[], wait=False):
 
 
 class Pager:
-    def __init__(self, endpoint, limit=20, offset=0, result_type='', *args, **kwargs):
+    def __init__(self, endpoint, limit=20, offset=0, params={}, result_type='', *args, **kwargs):
         limit = min(50, limit)
         self.endpoint = endpoint
         self.result_type = result_type
         self._args = args
         self._kwargs = kwargs
         self._endpoint_formatted = endpoint + '?limit={}&offset={}'.format(limit, offset)
+        if params:
+            for k, v in params.items():
+                self._endpoint_formatted += '&{}={}'.format(k, v)
 
         self.content = request(self._endpoint_formatted, *args, **kwargs)
         self._update_from_content()
