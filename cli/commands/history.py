@@ -44,7 +44,11 @@ def history(verbose=0, raw=False, limit=10, _return_parsed=False):
         ]
 
         # last played parsing
-        played_at = datetime.strptime(item['played_at'].split('.')[0], '%Y-%m-%dT%H:%M:%S')
+        try:
+            played_at = datetime.strptime(item['played_at'], '%Y-%m-%dT%H:%M:%S.%fZ')
+        except ValueError:
+            played_at = datetime.strptime(item['played_at'], '%Y-%m-%dT%H:%M:%SZ')
+
         timediff = current_time - played_at
         timediff_hours = int(timediff.seconds / 3600)
         if timediff.days >= 1:
