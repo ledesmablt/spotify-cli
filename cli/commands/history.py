@@ -38,10 +38,10 @@ def history(verbose=0, raw=False, limit=10, _return_parsed=False):
     timediffs = set()
     for i, item in enumerate(pager.content['items']):
         parsed_item = parse_track_item_full(item['track'])
-        row = [
-            cut_string(', '.join(parsed_item['artists']['names']), 30),
-            cut_string(parsed_item['track']['name'], 50),
-        ]
+        row_dict = {
+            'Artist': cut_string(', '.join(parsed_item['artists']['names']), 30),
+            'Track': cut_string(parsed_item['track']['name'], 50),
+        }
 
         # last played parsing
         try:
@@ -65,7 +65,8 @@ def history(verbose=0, raw=False, limit=10, _return_parsed=False):
         else:
             timediffs.add(timediff_str)
 
-        row.insert(0, timediff_str)
+        row_dict['Last played'] = timediff_str
+        row = [row_dict[h] for h in headers]
         table.append(row)
 
     if len(table) == 0:
