@@ -21,6 +21,7 @@ setup(
     install_requires=[
         'Click',
         'PyInquirer',
+        'tabulate',
     ],
     entry_points='''
         [console_scripts]
