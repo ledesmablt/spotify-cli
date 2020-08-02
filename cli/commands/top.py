@@ -19,7 +19,8 @@ from cli.utils.exceptions import *
     '-t', '--time',
     default='medium',
     type=click.Choice(['short', 'medium', 'long'], case_sensitive=False),
-    help='Specify the timeframe for your top tracks/artists (default: medium).'
+    help='Specify the timeframe for your top tracks/artists (default: medium).',
+    metavar='<int>'
 )
 @click.option(
     '-l', '--limit', type=int, default=10,

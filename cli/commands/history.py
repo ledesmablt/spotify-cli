@@ -9,7 +9,8 @@ from cli.utils.exceptions import *
 @click.command(options_metavar='[<options>]')
 @click.option(
     '-l', '--limit', type=int, default=10,
-    help='Number of tracks to show.'
+    help='Number of tracks to show.',
+    metavar='<int>'
 )
 @click.option(
     '-v', '--verbose', count=True,

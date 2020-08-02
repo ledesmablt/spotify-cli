@@ -7,7 +7,7 @@ from cli.utils.exceptions import AuthScopeError, FeatureInDevelopment
 @click.command(options_metavar='[<options>]')
 @click.option(
     '--track', 'queue_type', flag_value='track', default=True,
-    help='Add track <name> to the queue.'
+    help='(default) Add track <name> to the queue.'
 )
 @click.option(
     '--album', 'queue_type', flag_value='album',
