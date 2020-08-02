@@ -43,16 +43,7 @@ def status(verbose=0, raw=False, _override={}, _return_parsed=False):
         'volume': res['device']['volume_percent'],
     }
     item = res['item']
-    context = {'type': None}
-    if res['context']:
-        # note: playback context not available if private session or unnamed playlist
-        context = {
-            'type': res['context']['type'],
-            'id': res['context']['href'].split('/')[-1],
-            'url': res['context']['external_urls']['spotify'],
-            'api': res['context']['href'],
-            'uri': res['context']['uri'],
-        }
+    context = parse_context(res['context'])
 
     data['music'] = {
         'context': context,

@@ -31,6 +31,19 @@ def parse_artists(artists):
         'urls': [a['external_urls']['spotify'] for a in artists],
     }
 
+def parse_context(context):
+    # playback context not available if private session or unnamed playlist
+    if not context:
+        return {'type': None}
+
+    return {
+        'type': context['type'],
+        'id': context['href'].split('/')[-1],
+        'url': context['external_urls']['spotify'],
+        'api': context['href'],
+        'uri': context['uri'],
+    }
+
 def parse_track_item_full(item):
     return {
         'track': parse_track(item),
