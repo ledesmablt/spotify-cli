@@ -151,10 +151,10 @@ def multirequest(requests_arr=[], wait=False):
 
 
 class Pager:
-    def __init__(self, endpoint, limit=20, offset=0, params={}, result_type='', *args, **kwargs):
+    def __init__(self, endpoint, limit=20, offset=0, params={}, content_callback=None, *args, **kwargs):
         limit = min(50, limit)
         self.endpoint = endpoint
-        self.result_type = result_type
+        self._content_callback = content_callback
         self._args = args
         self._kwargs = kwargs
         self._endpoint_formatted = endpoint + '?limit={}&offset={}'.format(limit, offset)
@@ -163,6 +163,8 @@ class Pager:
                 self._endpoint_formatted += '&{}={}'.format(k, v)
 
         self.content = request(self._endpoint_formatted, *args, **kwargs)
+        if self._content_callback:
+            self.content = self._content_callback(self.content)
         self._update_from_content()
         return
 
@@ -180,6 +182,8 @@ class Pager:
             raise PagerLimitReached
 
         self.content = request(self.next_url, *self._args, **self._kwargs)
+        if self._content_callback:
+            self.content = self._content_callback(self.content)
         self._update_from_content()
         return
 
