@@ -17,6 +17,7 @@ from cli.commands.queue import queue
 from cli.commands.browse import browse
 from cli.commands.history import history
 from cli.commands.top import top
+from cli.commands.search import search
 
 
 # CLI group
@@ -45,3 +46,4 @@ cli.add_command(queue)
 cli.add_command(browse)
 cli.add_command(history)
 cli.add_command(top)
+cli.add_command(search)
