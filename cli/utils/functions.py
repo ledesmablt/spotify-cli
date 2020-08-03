@@ -1,3 +1,4 @@
+import time
 import urllib.parse as ul
 from uuid import uuid1
 from datetime import timedelta
@@ -45,3 +46,16 @@ def cut_string(string, limit=30):
         return string
     else:
         return string[:limit-3] + '...'
+
+
+def retry(callback, retries, sleep=0.5, catch=Exception, *args, **kwargs):
+    r = 0
+    while r < retries:
+        r += 1
+        try:
+            return callback(*args, **kwargs)
+        except catch as c:
+            if r == retries:
+                raise c
+            else:
+                time.sleep(r * sleep)
