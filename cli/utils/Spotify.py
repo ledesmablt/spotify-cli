@@ -163,12 +163,12 @@ class Pager:
                 self._endpoint_formatted += '&{}={}'.format(k, v)
 
         self.content = request(self._endpoint_formatted, *args, **kwargs)
-        if self._content_callback:
-            self.content = self._content_callback(self.content)
         self._update_from_content()
         return
 
     def _update_from_content(self):
+        if self._content_callback:
+            self.content = self._content_callback(self.content)
         self.items = self.content['items']
         self.next_url = self.content['next']
         self.previous_url = self.content.get('previous')
@@ -182,8 +182,6 @@ class Pager:
             raise PagerLimitReached
 
         self.content = request(self.next_url, *self._args, **self._kwargs)
-        if self._content_callback:
-            self.content = self._content_callback(self.content)
         self._update_from_content()
         return
 
