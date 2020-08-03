@@ -71,17 +71,18 @@ def search(keywords, search_type='all', library=False, verbose=0, raw=False, lim
         
 
     headers.insert(0, '#')
-    end = False
     click.echo(
         '\nSearch results for "{}"'
         .format(keywords, int(pager.offset / pager.limit) + 1)
     )
-    while not end:
+    parsed_content = {}
+    end_search = False
+    while not end_search:
         table = []
-        parsed_content = []
         for i, item in enumerate(pager.content['items']):
-            parsed_item = _parse(item, i)
-            parsed_content.append(parsed_item)
+            index = pager.offset + 1 + i
+            parsed_item = _parse(item, index)
+            parsed_content[index] = parsed_item
             row = [parsed_item[h] for h in headers]
             table.append(row)
 
@@ -103,6 +104,30 @@ def search(keywords, search_type='all', library=False, verbose=0, raw=False, lim
         elif cmd == 'b':
             pager.previous()
         else:
-            raise FeatureInDevelopment
+            # parse selection
+            indices_str = response.split(' ')[1]
+            indices = indices_str.split(',')
+            selected = []
+            for i in indices:
+                try:
+                    selected.append(parsed_content[int(i)])
+                except:
+                    continue
+
+            # parse command
+            click.echo('\n', nl=False)
+            if cmd == 'p':
+                conf = click.confirm('Play the selected track/s? ({})'.format(indices_str))
+                if conf:
+                    from cli.commands.play import play
+                    play.callback(_request_kwargs={
+                        'data': {'uris': [track['uri'] for track in selected]}
+                    })
+            else:
+                raise FeatureInDevelopment
+
+            end_search = not click.confirm('\nContinue searching?')
+
 
     return
+

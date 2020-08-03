@@ -23,7 +23,7 @@ from cli.utils.exceptions import NoPlaybackError
     type=click.Choice(['all', 'track', 'off'], case_sensitive=False),
     help='Turn repeat on (all/track) or off.'
 )
-def play(verbose=0, quiet=False, shuffle=None, repeat=None):
+def play(verbose=0, quiet=False, shuffle=None, repeat=None, _request_kwargs={}):
     """Resume playback."""
     requests = []
     if shuffle:
@@ -44,7 +44,8 @@ def play(verbose=0, quiet=False, shuffle=None, repeat=None):
     Spotify.request(
         'me/player/play', method='PUT',
         ignore_errs=[403],
-        handle_errs={404: NoPlaybackError}
+        handle_errs={404: NoPlaybackError},
+        **_request_kwargs
     )
 
     if not quiet:
