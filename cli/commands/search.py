@@ -58,12 +58,14 @@ def search(keywords, search_type='all', library=False, verbose=0, raw=False, lim
 
     if search_type == 'track':
         headers = ['Track', 'Artist']
-        def _parse(item):
+        def _parse(item, index):
             item = parse_track_item_full(item)
-            return [
-                cut_string(item['track']['name'], 50),
-                cut_string(', '.join(item['artists']['names']), 30)
-            ]
+            return {
+                'Track': cut_string(item['track']['name'], 50),
+                'Artist': cut_string(', '.join(item['artists']['names']), 30),
+                'uri': item['track']['uri'],
+                '#': index,
+            }
     else:
         raise FeatureInDevelopment
         
@@ -76,17 +78,23 @@ def search(keywords, search_type='all', library=False, verbose=0, raw=False, lim
     )
     while not end:
         table = []
+        parsed_content = []
         for i, item in enumerate(pager.content['items']):
-            table.append([pager.offset + i + 1] + _parse(item))
+            parsed_item = _parse(item, i)
+            parsed_content.append(parsed_item)
+            row = [parsed_item[h] for h in headers]
+            table.append(row)
 
         if len(table) == 0:
             click.echo('No data available for your search query.', err=True)
             return
 
+        click.echo('\n', nl=False)
         click.echo(tabulate(table, headers=headers))
         response = click.prompt(
             '\nActions:\n'
             '[n]ext/[b]ack\n[p]lay/[q]ueue/[s]ave #[,...]\n'
+            '[a]dd to playlist #[,...] <playlist>\n'
         ).lower()
 
         cmd = response.split(' ')[0]
@@ -96,6 +104,5 @@ def search(keywords, search_type='all', library=False, verbose=0, raw=False, lim
             pager.previous()
         else:
             raise FeatureInDevelopment
-
 
     return
