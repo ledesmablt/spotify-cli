@@ -5,34 +5,32 @@ from cli.utils.exceptions import *
 
 
 @click.command(options_metavar='[<options>]')
-@click.option(
-    '-t', '--to', type=int, default=0,
-    help='Set volume to <int> percent.',
-    metavar='<int>'
+@click.argument(
+    'mode', type=click.Choice(['to', 'up', 'down'], case_sensitive=False),
+    metavar='<mode>'
 )
-@click.option(
-    '-u', '--up', type=int, default=0,
-    help='Increase volume by <int> percent.',
-    metavar='<int>'
+@click.argument(
+    'amount', type=int,
+    metavar='<amount>'
 )
-@click.option(
-    '-d', '--down', type=int, default=0,
-    help='Decrease volume by <int> percent.',
-    metavar='<int>'
-)
-def volume(to, up, down):
-    """Control the active device's volume level."""
-    num_options = (bool(up) + bool(down) + bool(to))
-    if num_options != 1:
-        raise InvalidVolumeInput
+def volume(mode, amount):
+    """Control the active device's volume level (0-100).
 
-    if to:
-        new_volume = to
+    Example: spotify volume to 50
+    """
+    if mode == 'to':
+        new_volume = amount
     else:
         from cli.commands.status import status
         device = status.callback(raw=True, verbose=-1).get('device')
         current_volume = device['volume_percent']
-        new_volume = current_volume + up - down
+
+        if mode == 'up':
+            increment = amount
+        elif mode == 'down':
+            increment = - amount
+
+        new_volume = current_volume + increment
         if new_volume > 100:
             new_volume = 100
         elif new_volume < 0:
