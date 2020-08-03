@@ -65,6 +65,8 @@ def search(keywords, search_type='all', library=False, verbose=0, raw=False, lim
                 'Artist': cut_string(', '.join(item['artists']['names']), 30),
                 'uri': item['track']['uri'],
                 '#': index,
+                'context_uri': item['album']['uri'],
+                'track_number': item['track']['track_number'],
             }
     else:
         raise FeatureInDevelopment
@@ -116,13 +118,27 @@ def search(keywords, search_type='all', library=False, verbose=0, raw=False, lim
 
             # parse command
             click.echo('\n', nl=False)
+            if len(selected) == 0:
+                click.echo('Input error! Please try again.', err=True)
+                continue
+
             if cmd == 'p':
                 conf = click.confirm('Play the selected track/s? ({})'.format(indices_str))
                 if conf:
                     from cli.commands.play import play
-                    play.callback(_request_kwargs={
-                        'data': {'uris': [track['uri'] for track in selected]}
-                    })
+                    if len(selected) == 1:
+                        req_data = {
+                            'context_uri': selected[0]['context_uri'],
+                            'offset': {
+                                'uri': selected[0]['uri'],
+                            },
+                        }
+                    else:
+                        req_data = {
+                            'uris': [track['uri'] for track in selected],
+                        }
+
+                    play.callback(_request_kwargs={'data': req_data})
             else:
                 raise FeatureInDevelopment
 

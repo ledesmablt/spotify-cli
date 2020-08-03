@@ -1,6 +1,7 @@
 import click
 
 from cli.utils import Spotify
+from cli.utils.functions import retry
 from cli.utils.exceptions import NoPlaybackError
 
 
@@ -50,6 +51,10 @@ def play(verbose=0, quiet=False, shuffle=None, repeat=None, _request_kwargs={}):
 
     if not quiet:
         from cli.commands.status import status
-        status.callback(verbose=verbose, _override={'is_playing': True})
+        retry(
+            status.callback,
+            retries=3, sleep=0.5, catch=TypeError,
+            verbose=verbose, _override={'is_playing': True}
+        )
 
     return
