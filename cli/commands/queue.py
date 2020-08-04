@@ -86,7 +86,7 @@ def queue(keyword, queue_type='track', yes=False, verbose=0, quiet=False):
         } 
         for uri in uris
     ]
-    Spotify.multirequest(requests)
+    Spotify.multirequest(requests, delay_between=0.25)
 
 
     # print output
