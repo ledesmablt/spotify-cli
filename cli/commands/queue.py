@@ -8,6 +8,16 @@ from cli.utils.exceptions import AuthScopeError, FeatureInDevelopment
 
 @click.command(options_metavar='[<options>]')
 @click.option(
+    '--track', 'queue_type', flag_value='track', default=True,
+    help='(default) Add a track to the queue.',
+    metavar='<keyword>'
+)
+@click.option(
+    '--album', 'queue_type', flag_value='album',
+    help='Add an album to the queue.',
+    metavar='<keyword>'
+)
+@click.option(
     '-y', '--yes', is_flag=True,
     help='Skip the confirmation prompt.'
 )
@@ -20,54 +30,71 @@ from cli.utils.exceptions import AuthScopeError, FeatureInDevelopment
     help='Suppress output.'
 )
 @click.argument('keyword', type=str, metavar='<keyword>')
-def queue(keyword, yes=False, verbose=0, quiet=False):
-    """Add a track to your queue.
+def queue(keyword, queue_type='track', yes=False, verbose=0, quiet=False):
+    """Add a track or album to your queue.
 
     Example: Use 'spotify queue .' to add the current track.
     """
     if keyword == '.':
         from cli.commands.status import status
         playback_data = status.callback(_return_parsed=True)
-        track = playback_data['music']['track']
+        item = playback_data['music']['track']
     else:
         import urllib.parse as ul
         pager = Spotify.Pager(
             'search',
             params={
                 'q': ul.quote_plus(keyword),
-                'type': 'track',
+                'type': queue_type,
             },
-            content_callback=lambda c: c['tracks'],
+            content_callback=lambda c: c[queue_type+'s'],
         )
         if len(pager.content['items']) == 0:
             click.echo('No results found for "{}"'.format(keywords), err=True)
             return
 
-        track = pager.content['items'][0]
+        item = pager.content['items'][0]
 
 
     # parse command and playback context
-    display_str = '{} - {}'.format(
-        cut_string(track['name'], 50),
-        cut_string(', '.join(parse_artists(track['artists'])['names']), 30)
+    display_str = '{} - {}{}'.format(
+        cut_string(item['name'], 50),
+        cut_string(', '.join(parse_artists(item['artists'])['names']), 30),
+        '' if queue_type == 'track' else ' ({} tracks)'.format(item['total_tracks']),
     )
 
     # handle confirmation & request
     if not yes:
         click.confirm(
-            display_str + '\nAdd this track to the queue?',
+            display_str + '\nAdd this {} to the queue?'.format(queue_type),
             default=True, abort=True
         )
 
-    endpoint = 'me/player/queue?uri=' + track['uri']
-    Spotify.request(
-        endpoint, method='POST',
-        handle_errs={}
-    )
+    if queue_type == 'track':
+        uris = [item['uri']]
+    else:
+        album = Spotify.request('albums/' + item['id'])
+        uris = [
+            track['uri']
+            for track in album['tracks']['items']
+        ]
+
+    requests = [
+        {
+            'endpoint': 'me/player/queue?uri=' + uri,
+            'method': 'POST',
+        } 
+        for uri in uris
+    ]
+    Spotify.multirequest(requests)
+
+
+    # print output
     if not quiet:
-        if not yes:
-            click.echo('Track added to the queue.')
-        else:
-            click.echo('Added track to queue:\n' + display_str)
+        click.echo(
+            queue_type.capitalize() +
+            ' added to queue' +
+            ('.' if not yes else ':\n' + display_str)
+        )
 
     return
