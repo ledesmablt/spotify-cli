@@ -102,12 +102,26 @@ def search(keywords, search_type='all', library=False, verbose=0, raw=False, lim
 
         cmd = response.split(' ')[0]
         if cmd == 'n':
-            pager.next()
+            try:
+                pager.next()
+            except PagerLimitReached:
+                click.echo('\nThere are no more results to display.')
+                continue
+
         elif cmd == 'b':
-            pager.previous()
+            try:
+                pager.previous()
+            except PagerPreviousUnavailable:
+                click.echo('\nYou are already at the first page.')
+                continue
         else:
             # parse selection
-            indices_str = response.split(' ')[1]
+            try:
+                indices_str = response.split(' ')[1]
+            except IndexError:
+                click.echo('\nInput error! Please try again.', err=True)
+                continue
+
             indices = indices_str.split(',')
             selected = []
             for i in indices:
@@ -119,11 +133,11 @@ def search(keywords, search_type='all', library=False, verbose=0, raw=False, lim
             # parse command
             click.echo('\n', nl=False)
             if len(selected) == 0:
-                click.echo('Input error! Please try again.', err=True)
+                click.echo('\nInput error! Please try again.', err=True)
                 continue
 
             if cmd == 'p':
-                conf = click.confirm('Play the selected track/s? ({})'.format(indices_str))
+                conf = click.confirm('Play the selected track/s? ({})'.format(indices_str), default=True)
                 if conf:
                     from cli.commands.play import play
                     if len(selected) == 1:
@@ -142,7 +156,7 @@ def search(keywords, search_type='all', library=False, verbose=0, raw=False, lim
             else:
                 raise FeatureInDevelopment
 
-            end_search = not click.confirm('\nContinue searching?')
+            end_search = not click.confirm('\nContinue searching?', default=True)
 
 
     return

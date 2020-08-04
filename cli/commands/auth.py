@@ -41,7 +41,7 @@ def login():
         '\n{} features selected. This will overwite your existing credentials.'
         .format(len(additional_scopes))
     )
-    click.confirm('Proceed with these settings?', abort=True)
+    click.confirm('Proceed with these settings?', default=True, abort=True)
 
     # handle auth and save credentials
     url = build_auth_url(additional_scopes)

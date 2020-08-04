@@ -50,7 +50,7 @@ def queue(name, queue_type='track', yes=False, verbose=0, quiet=False):
     if not yes:
         click.confirm(
             'Add {} "{}"{} to the queue?'.format(queue_type, name, total_tracks_str),
-            abort=True
+            default=True, abort=True
         )
 
     endpoint = 'me/player/queue?uri=' + uri
