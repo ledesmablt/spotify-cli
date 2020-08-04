@@ -1,5 +1,6 @@
 import os
 import json
+import time
 from urllib.error import HTTPError
 from urllib.request import Request, urlopen
 
@@ -139,13 +140,16 @@ def request(endpoint, *args, **kwargs):
     return res_data
 
 
-def multirequest(requests_arr=[], wait=False):
+def multirequest(requests_arr=[], wait=False, delay_between=0):
     from concurrent.futures import ThreadPoolExecutor
     executor = ThreadPoolExecutor(max_workers=5)
-    futures = [
-        executor.submit(request, **req)
-        for req in requests_arr
-    ]
+    futures = []
+    for req in requests_arr:
+        time.sleep(delay_between)
+        futures.append(
+            executor.submit(request, **req)
+        )
+
     executor.shutdown(wait=wait)
     return futures
 
