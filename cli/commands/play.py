@@ -12,6 +12,16 @@ from cli.utils.exceptions import *
     metavar='<keyword>'
 )
 @click.option(
+    '--album', type=str,
+    help='Search for an album to play.',
+    metavar='<keyword>'
+)
+@click.option(
+    '--playlist', type=str,
+    help='Search for a playlist to play.',
+    metavar='<keyword>'
+)
+@click.option(
     '-v', '--verbose', count=True,
     help='Output more info (repeatable flag).'
 )
@@ -29,15 +39,28 @@ from cli.utils.exceptions import *
     type=click.Choice(['all', 'track', 'off'], case_sensitive=False),
     help='Turn repeat on (all/track) or off.'
 )
-def play(verbose=0, quiet=False, shuffle=None, repeat=None, track=None, _request_kwargs={}):
+def play(
+    verbose=0, quiet=False, shuffle=None, repeat=None,
+    track=None, album=None, playlist=None,
+    _request_kwargs={}
+):
     """Resume playback."""
-    is_search = False
+    from cli.commands.shuffle import shuffle as shuffle_cmd
+
+    is_search = True
     keywords = ''
     requests = []
     if track:
-        is_search = True
         search_type = 'track'
         keywords = track
+    elif album:
+        search_type = 'album'
+        keywords = album
+    elif playlist:
+        search_type = 'playlist'
+        keywords = playlist
+    else:
+        is_search = False
 
     if is_search:
         import urllib.parse as ul
@@ -49,7 +72,7 @@ def play(verbose=0, quiet=False, shuffle=None, repeat=None, track=None, _request
             },
             content_callback=lambda c: c[search_type+'s'],
         )
-        if len(pager.content) == 0:
+        if len(pager.content['items']) == 0:
             click.echo('No results found for "{}"'.format(keywords), err=True)
             return
         
@@ -61,12 +84,19 @@ def play(verbose=0, quiet=False, shuffle=None, repeat=None, track=None, _request
                     'uri': item['uri'],
                 },
             }}
-        else:
-            raise FeatureInDevelopment
+        elif search_type in ['album', 'playlist']:
+            _request_kwargs = {'data': {
+                'context_uri': item['uri'],
+            }}
+            if not shuffle:
+                # override shuffle state if not explicitly stated
+                requests.append(
+                    shuffle_cmd.callback(shuffle, _create_request=True)
+                )
+                pass
 
 
     if shuffle:
-        from cli.commands.shuffle import shuffle as shuffle_cmd
         requests.append(
             shuffle_cmd.callback(shuffle, _create_request=True)
         )
