@@ -138,7 +138,7 @@ def search(keywords, search_type='all', library=False, verbose=0, raw=False, lim
                             'uris': [track['uri'] for track in selected],
                         }
 
-                    play.callback(_request_kwargs={'data': req_data})
+                    play.callback(data=req_data)
             else:
                 raise FeatureInDevelopment
 

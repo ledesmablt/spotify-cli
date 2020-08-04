@@ -42,7 +42,7 @@ from cli.utils.exceptions import *
 def play(
     verbose=0, quiet=False, shuffle=None, repeat=None,
     track=None, album=None, playlist=None,
-    _request_kwargs={}
+    *args, **kwargs
 ):
     """Resume playback."""
     from cli.commands.shuffle import shuffle as shuffle_cmd
@@ -78,22 +78,21 @@ def play(
         
         item = pager.content['items'][0]
         if search_type == 'track':
-            _request_kwargs = {'data': {
+            kwargs['data'] = {
                 'context_uri': item['album']['uri'],
                 'offset': {
                     'uri': item['uri'],
                 },
-            }}
+            }
         elif search_type in ['album', 'playlist']:
-            _request_kwargs = {'data': {
+            kwargs['data'] = {
                 'context_uri': item['uri'],
-            }}
+            }
             if not shuffle:
                 # override shuffle state if not explicitly stated
                 requests.append(
                     shuffle_cmd.callback(shuffle, _create_request=True)
                 )
-                pass
 
 
     if shuffle:
@@ -114,7 +113,7 @@ def play(
         'me/player/play', method='PUT',
         ignore_errs=[403],
         handle_errs={404: NoPlaybackError},
-        **_request_kwargs
+        *args, **kwargs
     )
 
     if not quiet:
