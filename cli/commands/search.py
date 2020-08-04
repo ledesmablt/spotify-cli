@@ -96,7 +96,8 @@ def search(keywords, search_type='all', library=False, verbose=0, raw=False, lim
         click.echo(tabulate(table, headers=headers))
         response = click.prompt(
             '\nActions:\n'
-            '[n]ext/[b]ack\n[p]lay/[q]ueue/[s]ave #[,...]\n'
+            '[n]ext/[b]ack\n'
+            '[p]lay/[q]ueue/[s]ave #[,...]\n'
             '[a]dd to playlist #[,...] <playlist>\n'
         ).lower()
 
@@ -153,6 +154,20 @@ def search(keywords, search_type='all', library=False, verbose=0, raw=False, lim
                         }
 
                     play.callback(data=req_data)
+
+            elif cmd == 'q':
+                conf = click.confirm('Queue the selected track/s? ({})'.format(indices_str), default=True)
+                if conf:
+                    requests = [
+                        {
+                            'endpoint': 'me/player/queue?uri=' + s['uri'],
+                            'method': 'POST',
+                        }
+                        for s in selected
+                    ]
+                    Spotify.multirequest(requests, delay_between=0.1)
+                    click.echo('{} track/s queued.'.format(len(selected)))
+
             else:
                 raise FeatureInDevelopment
 
