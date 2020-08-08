@@ -67,17 +67,32 @@ def search(keyword, search_type='all', verbose=0, raw=False, limit=10, _return_p
     if search_type == 'artist':
         commands[0] = ['[s]ave']
         commands.pop(1)
+    elif search_type == 'playlist':
+        commands[0] = ['[p]lay', '[s]ave']
+        commands.pop(1)
 
+
+    def _get_headers():
+        if search_type == 'track':
+            return ['Track', 'Artist']
+        elif search_type == 'album':
+            return ['Album', 'Artist']
+        elif search_type == 'artist':
+            return ['Artist']
+        elif search_type == 'playlist':
+            return ['Playlist', 'Created by', '# of tracks']
 
     def _get_conf_msg(cmd, search_type, indices_str):
         mapping = {
             'p': {
                 'track': 'Play the selected track/s? ({})'.format(indices_str),
                 'album': 'Play the selected album? ({})'.format(indices_str.split(',')[0]),
+                'playlist': 'Play the selected playlist? ({})'.format(indices_str.split(',')[0]),
             },
             'q': {
                 'track': 'Queue the selected track/s? ({})'.format(indices_str),
                 'album': 'Queue the selected album? ({})'.format(indices_str.split(',')[0]),
+                'playlist': 'Queue the selected playlist? ({})'.format(indices_str.split(',')[0]),
             }
         }
         cmd_map = mapping.get(cmd)
@@ -90,44 +105,40 @@ def search(keyword, search_type='all', verbose=0, raw=False, limit=10, _return_p
         else:
             return output
 
-    def _get_headers():
-        if search_type == 'track':
-            return ['Track', 'Artist']
-        elif search_type == 'album':
-            return ['Album', 'Artist']
-        elif search_type == 'artist':
-            return ['Artist']
-        else:
-            raise FeatureInDevelopment
-
     def _parse(item, index):
         if search_type == 'track':
             item = parse_track_item_full(item)
-            return {
+            output = {
                 'Track': cut_string(item['track']['name'], 50),
                 'Artist': cut_string(', '.join(item['artists']['names']), 30),
                 'uri': item['track']['uri'],
-                '#': index,
                 'context_uri': item['album']['uri'],
                 'track_number': item['track']['track_number'],
             }
         elif search_type == 'album':
-            return {
+            output = {
                 'Album': cut_string(item['name'], 50),
                 'Artist': cut_string(', '.join([a['name'] for a in item['artists']]), 30),
                 'uri': item['uri'],
-                '#': index,
                 'id': item['id'],
             }
         elif search_type == 'artist':
-            return {
+            output = {
                 'Artist': item['name'],
                 'uri': item['uri'],
-                '#': index,
                 'id': item['id'],
             }
-        else:
-            raise FeatureInDevelopment
+        elif search_type == 'playlist':
+            output = {
+                'Playlist': cut_string(item['name'], 50),
+                'Created by': cut_string(item['owner'].get('display_name'), 30),
+                '# of tracks': item['tracks'].get('total', 0),
+                'uri': item['uri'],
+                'id': item['id'],
+            }
+
+        output['#'] = index
+        return output
 
     def _format_play_req(selected):
         if search_type == 'track':
@@ -143,7 +154,7 @@ def search(keyword, search_type='all', verbose=0, raw=False, limit=10, _return_p
                     'uris': [track['uri'] for track in selected],
                 }
 
-        elif search_type == 'album':
+        elif search_type in ['album', 'playlist']:
             return {
                 'context_uri': selected[0]['uri']
             }
@@ -251,7 +262,8 @@ def search(keyword, search_type='all', verbose=0, raw=False, limit=10, _return_p
             elif cmd == 'p':
                 from cli.commands.play import play
                 req_data = _format_play_req(selected)
-                play.callback(data=req_data, wait=0.2)
+                play.callback(data=req_data, quiet=True)
+                click.echo('Now playing: {}'.format(selected[0][search_type.capitalize()]))
 
             elif cmd == 'q':
                 requests = _format_queue_reqs(selected)
