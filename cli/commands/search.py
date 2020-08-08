@@ -60,6 +60,15 @@ def search(keyword, search_type='all', verbose=0, raw=False, limit=10, _return_p
         return pager.content
 
 
+    commands = {
+        0: ['[p]lay', '[q]ueue', '[s]ave'],
+        1: '[a]dd to playlist #[,...] <playlist>\n',
+    }
+    if search_type == 'artist':
+        commands[0] = ['[s]ave']
+        commands.pop(1)
+
+
     def _get_conf_msg(cmd, search_type, indices_str):
         mapping = {
             'p': {
@@ -81,15 +90,18 @@ def search(keyword, search_type='all', verbose=0, raw=False, limit=10, _return_p
         else:
             return output
 
+    def _get_headers():
+        if search_type == 'track':
+            return ['Track', 'Artist']
+        elif search_type == 'album':
+            return ['Album', 'Artist']
+        elif search_type == 'artist':
+            return ['Artist']
+        else:
+            raise FeatureInDevelopment
 
-    commands = {
-        0: ['[p]lay', '[q]ueue', '[s]ave'],
-        1: '[a]dd to playlist #[,...] <playlist>\n',
-    }
-
-    if search_type == 'track':
-        headers = ['Track', 'Artist']
-        def _parse(item, index):
+    def _parse(item, index):
+        if search_type == 'track':
             item = parse_track_item_full(item)
             return {
                 'Track': cut_string(item['track']['name'], 50),
@@ -99,8 +111,26 @@ def search(keyword, search_type='all', verbose=0, raw=False, limit=10, _return_p
                 'context_uri': item['album']['uri'],
                 'track_number': item['track']['track_number'],
             }
+        elif search_type == 'album':
+            return {
+                'Album': cut_string(item['name'], 50),
+                'Artist': cut_string(', '.join([a['name'] for a in item['artists']]), 30),
+                'uri': item['uri'],
+                '#': index,
+                'id': item['id'],
+            }
+        elif search_type == 'artist':
+            return {
+                'Artist': item['name'],
+                'uri': item['uri'],
+                '#': index,
+                'id': item['id'],
+            }
+        else:
+            raise FeatureInDevelopment
 
-        def _format_play_req(selected):
+    def _format_play_req(selected):
+        if search_type == 'track':
             if len(selected) == 1:
                 return {
                     'context_uri': selected[0]['context_uri'],
@@ -113,7 +143,13 @@ def search(keyword, search_type='all', verbose=0, raw=False, limit=10, _return_p
                     'uris': [track['uri'] for track in selected],
                 }
 
-        def _format_queue_reqs(selected):
+        elif search_type == 'album':
+            return {
+                'context_uri': selected[0]['uri']
+            }
+
+    def _format_queue_reqs(selected):
+        if search_type == 'track':
             return [
                 {
                     'endpoint': 'me/player/queue?uri=' + s['uri'],
@@ -122,49 +158,18 @@ def search(keyword, search_type='all', verbose=0, raw=False, limit=10, _return_p
                 for s in selected
             ]
 
-    elif search_type == 'album':
-        headers = ['Album', 'Artist']
-        def _parse(item, index):
-            return {
-                'Album': cut_string(item['name'], 50),
-                'Artist': cut_string(', '.join([a['name'] for a in item['artists']]), 30),
-                'uri': item['uri'],
-                '#': index,
-                'id': item['id'],
-            }
-
-        def _format_play_req(selected):
-            return {
-                'context_uri': selected[0]['uri']
-            }
-        
-        def _format_queue_reqs(selected):
-            album = Spotify.request('albums/' + selected[0]['id'])
+        elif search_type == 'album':
+            album = spotify.request('albums/' + selected[0]['id'])
             return [
                 {
                     'endpoint': 'me/player/queue?uri=' + track['uri'],
-                    'method': 'POST',
+                    'method': 'post',
                 }
                 for track in album['tracks']['items']
             ]
 
-    elif search_type == 'artist':
-        headers = ['Artist']
-        commands[0] = ['[s]ave']
-        commands.pop(1)
-        def _parse(item, index):
-            return {
-                'Artist': item['name'],
-                'uri': item['uri'],
-                '#': index,
-                'id': item['id'],
-            }
 
-    else:
-        raise FeatureInDevelopment
-        
-
-    headers.insert(0, '#')
+    headers = ['#'] + _get_headers()
     click.echo(
         '\nSearch results for "{}"'
         .format(keyword, int(pager.offset / pager.limit) + 1)
