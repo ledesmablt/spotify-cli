@@ -1,7 +1,9 @@
 import click
 
 from cli.utils import Spotify
-from cli.utils.exceptions import AuthScopeError
+from cli.utils.parsers import *
+from cli.utils.exceptions import *
+from cli.utils.functions import cut_string
 
 
 @click.command(options_metavar='[<options>]')
@@ -22,6 +24,10 @@ from cli.utils.exceptions import AuthScopeError
     help='Follow the current playlist.'
 )
 @click.option(
+    '-y', '--yes', is_flag=True,
+    help='Skip the confirmation prompt.'
+)
+@click.option(
     '-v', '--verbose', count=True,
     help='Output more info (repeatable flag).'
 )
@@ -29,28 +35,61 @@ from cli.utils.exceptions import AuthScopeError
     '-q', '--quiet', is_flag=True,
     help='Suppress output.'
 )
-def save(save_type, verbose=0, quiet=False):
-    """Save the current track, album, artist, or playlist.
+@click.argument('keyword', type=str, metavar='<keyword>')
+def save(keyword, save_type, yes, verbose=0, quiet=False):
+    """Save a track, album, artist, or playlist.
 
-    Specify one of the above options to change what to save (default: track).
+    Example: Use 'spotify save .' to save the current track.
     """
-    from cli.commands.status import status
-    playback_data = status.callback(_return_parsed=True)
-    music = playback_data['music']
+    if keyword == '.':
+        from cli.commands.status import status
+        playback_data = status.callback(_return_parsed=True)
+        music = playback_data['music']
+    else:
+        import urllib.parse as ul
+        pager = Spotify.Pager(
+            'search',
+            params={
+                'q': ul.quote_plus(keyword),
+                'type': save_type,
+            },
+            content_callback=lambda c: c[save_type+'s'],
+        )
+        if len(pager.content['items']) == 0:
+            click.echo('No results found for "{}"'.format(keywords), err=True)
+            return
+
+        music = pager.content['items'][0]
+
 
     # parse command and playback context
-    if save_type in ['track', 'album', 'artist']:
-        id_str = music[save_type]['id']
-        name = music[save_type]['name']
+    if keyword == '.' and save_type != 'playlist':
+        music = music[save_type]
+
+    if save_type in ['track', 'album']:
+        id_str = music['id']
+        name = '{} - {}'.format(
+            cut_string(music['name'], 50),
+            cut_string(', '.join(parse_artists(music['artists'])['names']), 30),
+        )
+
+    elif save_type == 'artist':
+        id_str = music['id']
+        name = music['name']
+
 
     elif save_type == 'playlist':
         # playlist and radio are both type 'playlist'
-        if music['context']['type'] != 'playlist':
-            click.echo('Error: Current session is not a playlist.', err=True)
-            return
+        if keyword == '.':
+            if music['context']['type'] != 'playlist':
+                click.echo('Error: Current session is not a playlist.', err=True)
+                return
 
-        id_str = music['context']['id']
-        name = Spotify.request('playlists/' + id_str)['name']
+            id_str = music['context']['id']
+            name = Spotify.request('playlists/' + id_str)['name']
+        else:
+            id_str = music['id']
+            name = music['name']
 
 
     # format endpoint
@@ -67,6 +106,12 @@ def save(save_type, verbose=0, quiet=False):
         endpoint = 'playlists/{}/followers'.format(id_str)
         message = 'Following {} - {}.'.format(save_type, name)
         data = {'public': True}
+
+    if not yes:
+        click.confirm(
+            name + '\nSave this {} to your library?'.format(save_type),
+            default=True, abort=True
+        )
 
     Spotify.request(
         endpoint, method='PUT', data=data,
