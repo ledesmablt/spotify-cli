@@ -81,6 +81,11 @@ class PodcastNotSupported(ClickException):
         self.message = 'Podcasts are not supported.'
         super().__init__(self.message)
 
+class InvalidInput(ClickException):
+    def __init__(self, helpmsg=''):
+        self.message = 'Invalid input!' + helpmsg
+        super().__init__(self.message)
+
 
 class PagerLimitReached(Exception):
     """Results limit reached."""

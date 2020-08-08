@@ -71,8 +71,21 @@ def search(keyword, search_type='all', verbose=0, raw=False, limit=10, _return_p
                 'album': 'Queue the selected album? ({})'.format(indices_str.split(',')[0]),
             }
         }
-        return mapping[cmd][search_type]
+        cmd_map = mapping.get(cmd)
+        if not cmd_map:
+            raise FeatureInDevelopment
 
+        output = cmd_map.get(search_type)
+        if not output:
+            raise InvalidInput('\nCommand not supported for {} search.'.format(search_type))
+        else:
+            return output
+
+
+    commands = {
+        0: ['[p]lay', '[q]ueue', '[s]ave'],
+        1: '[a]dd to playlist #[,...] <playlist>\n',
+    }
 
     if search_type == 'track':
         headers = ['Track', 'Artist']
@@ -135,6 +148,18 @@ def search(keyword, search_type='all', verbose=0, raw=False, limit=10, _return_p
                 for track in album['tracks']['items']
             ]
 
+    elif search_type == 'artist':
+        headers = ['Artist']
+        commands[0] = ['[s]ave']
+        commands.pop(1)
+        def _parse(item, index):
+            return {
+                'Artist': item['name'],
+                'uri': item['uri'],
+                '#': index,
+                'id': item['id'],
+            }
+
     else:
         raise FeatureInDevelopment
         
@@ -164,8 +189,12 @@ def search(keyword, search_type='all', verbose=0, raw=False, limit=10, _return_p
         response = click.prompt(
             '\nActions:\n'
             '[n]ext/[b]ack\n'
-            '[p]lay/[q]ueue/[s]ave #[,...]\n'
-            '[a]dd to playlist #[,...] <playlist>\n'
+            '{} #[,...]\n'
+            '{}'
+            .format(
+                '/'.join(commands[0]),
+                commands.get(1, '')
+            )
         ).lower()
 
         cmd = response.split(' ')[0]
@@ -204,10 +233,13 @@ def search(keyword, search_type='all', verbose=0, raw=False, limit=10, _return_p
                 click.echo('\nInput error! Please try again.', err=True)
                 continue
 
-            conf = click.confirm(
-                _get_conf_msg(cmd, search_type, indices_str),
-                default=True
-            )
+            try:
+                conf_msg = _get_conf_msg(cmd, search_type, indices_str)
+            except InvalidInput as e:
+                click.echo(e.message, err=True)
+                continue
+
+            conf = click.confirm(conf_msg, default=True)
             if not conf:
                 pass
 
