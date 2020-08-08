@@ -1,7 +1,7 @@
 import click
 
-from cli.utils import Spotify
-from cli.utils.exceptions import AuthScopeError
+from ..utils import Spotify
+from ..utils.exceptions import AuthScopeError
 
 
 @click.command(options_metavar='[<options>]')

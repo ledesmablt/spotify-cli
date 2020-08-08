@@ -4,9 +4,9 @@ import time
 
 import click
 
-from cli.utils import Spotify
-from cli.utils.constants import *
-from cli.utils.functions import build_auth_url
+from ..utils import Spotify
+from ..utils.constants import *
+from ..utils.functions import build_auth_url
 
 
 @click.command()

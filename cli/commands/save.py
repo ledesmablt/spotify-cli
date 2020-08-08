@@ -1,9 +1,9 @@
 import click
 
-from cli.utils import Spotify
-from cli.utils.parsers import *
-from cli.utils.exceptions import *
-from cli.utils.functions import cut_string
+from ..utils import Spotify
+from ..utils.parsers import *
+from ..utils.exceptions import *
+from ..utils.functions import cut_string
 
 
 @click.command(options_metavar='[<options>]')

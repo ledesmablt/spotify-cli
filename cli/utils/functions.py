@@ -3,7 +3,7 @@ import urllib.parse as ul
 from uuid import uuid1
 from datetime import timedelta
 
-from cli.utils.constants import *
+from .constants import *
 
 
 def format_duration_ms(ms):

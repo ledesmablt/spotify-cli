@@ -4,8 +4,8 @@ import time
 from urllib.error import HTTPError
 from urllib.request import Request, urlopen
 
-from cli.utils.constants import *
-from cli.utils.exceptions import *
+from .constants import *
+from .exceptions import *
 
 
 def _read_json(file_path):
