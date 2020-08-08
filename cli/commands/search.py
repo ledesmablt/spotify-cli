@@ -6,18 +6,11 @@ from cli.utils.functions import cut_string
 from cli.utils.exceptions import *
 
 
-all_types = 'album,artist,playlist,track'
-
-
 @click.command(options_metavar='[<options>]')
 @click.option(
     '-t', '--type', 'search_type', default='track',
     type=click.Choice(['artist', 'track', 'playlist', 'album'], case_sensitive=False),
     help='Types of items to search (default: track)'
-)
-@click.option(
-    '--library', is_flag=True,
-    help='Limit search results to your library.'
 )
 @click.option(
     '-l', '--limit', type=int, default=10,
@@ -32,9 +25,9 @@ all_types = 'album,artist,playlist,track'
     help='Output raw API response.'
 )
 @click.argument(
-    'keywords', type=str, metavar='<keywords>'
+    'keyword', type=str, metavar='<keyword>'
 )
-def search(keywords, search_type='all', library=False, verbose=0, raw=False, limit=10, _return_parsed=False):
+def search(keyword, search_type='all', verbose=0, raw=False, limit=10, _return_parsed=False):
     """Search for any Spotify content."""
     import urllib.parse as ul
     from tabulate import tabulate
@@ -43,7 +36,7 @@ def search(keywords, search_type='all', library=False, verbose=0, raw=False, lim
         'search',
         limit=limit,
         params={
-            'q': ul.quote_plus(keywords),
+            'q': ul.quote_plus(keyword),
             'type': search_type,
         },
         content_callback=lambda c: c[search_type+'s'],
@@ -75,7 +68,7 @@ def search(keywords, search_type='all', library=False, verbose=0, raw=False, lim
     headers.insert(0, '#')
     click.echo(
         '\nSearch results for "{}"'
-        .format(keywords, int(pager.offset / pager.limit) + 1)
+        .format(keyword, int(pager.offset / pager.limit) + 1)
     )
     parsed_content = {}
     end_search = False
