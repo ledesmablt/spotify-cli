@@ -8,9 +8,20 @@ from cli.utils.exceptions import *
 
 @click.command(options_metavar='[<options>]')
 @click.option(
-    '-t', '--type', 'search_type', default='track',
-    type=click.Choice(['artist', 'track', 'playlist', 'album'], case_sensitive=False),
-    help='Types of items to search (default: track)'
+    '--track', 'search_type', flag_value='track', default=True,
+    help='(default) Search for a track.'
+)
+@click.option(
+    '--album', 'search_type', flag_value='album',
+    help='Search for an album'
+)
+@click.option(
+    '--artist', 'search_type', flag_value='artist',
+    help='Search for an artist.'
+)
+@click.option(
+    '--playlist', 'search_type', flag_value='playlist',
+    help='Search for a playlist'
 )
 @click.option(
     '-l', '--limit', type=int, default=10,
