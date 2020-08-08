@@ -49,6 +49,20 @@ def search(keyword, search_type='all', verbose=0, raw=False, limit=10, _return_p
         return pager.content
 
 
+    def _get_conf_msg(cmd, search_type, indices_str):
+        mapping = {
+            'p': {
+                'track': 'Play the selected track/s? ({})'.format(indices_str),
+                'album': 'Play the selected album? ({})'.format(indices_str.split(',')[0]),
+            },
+            'q': {
+                'track': 'Queue the selected track/s? ({})'.format(indices_str),
+                'album': 'Queue the selected album? ({})'.format(indices_str.split(',')[0]),
+            }
+        }
+        return mapping[cmd][search_type]
+
+
     if search_type == 'track':
         headers = ['Track', 'Artist']
         def _parse(item, index):
@@ -61,6 +75,55 @@ def search(keyword, search_type='all', verbose=0, raw=False, limit=10, _return_p
                 'context_uri': item['album']['uri'],
                 'track_number': item['track']['track_number'],
             }
+
+        def _format_play_req(selected):
+            if len(selected) == 1:
+                return {
+                    'context_uri': selected[0]['context_uri'],
+                    'offset': {
+                        'uri': selected[0]['uri'],
+                    },
+                }
+            else:
+                return {
+                    'uris': [track['uri'] for track in selected],
+                }
+
+        def _format_queue_reqs(selected):
+            return [
+                {
+                    'endpoint': 'me/player/queue?uri=' + s['uri'],
+                    'method': 'POST',
+                }
+                for s in selected
+            ]
+
+    elif search_type == 'album':
+        headers = ['Album', 'Artist']
+        def _parse(item, index):
+            return {
+                'Album': cut_string(item['name'], 50),
+                'Artist': cut_string(', '.join([a['name'] for a in item['artists']]), 30),
+                'uri': item['uri'],
+                '#': index,
+                'id': item['id'],
+            }
+
+        def _format_play_req(selected):
+            return {
+                'context_uri': selected[0]['uri']
+            }
+        
+        def _format_queue_reqs(selected):
+            album = Spotify.request('albums/' + selected[0]['id'])
+            return [
+                {
+                    'endpoint': 'me/player/queue?uri=' + track['uri'],
+                    'method': 'POST',
+                }
+                for track in album['tracks']['items']
+            ]
+
     else:
         raise FeatureInDevelopment
         
@@ -130,36 +193,22 @@ def search(keyword, search_type='all', verbose=0, raw=False, limit=10, _return_p
                 click.echo('\nInput error! Please try again.', err=True)
                 continue
 
-            if cmd == 'p':
-                conf = click.confirm('Play the selected track/s? ({})'.format(indices_str), default=True)
-                if conf:
-                    from cli.commands.play import play
-                    if len(selected) == 1:
-                        req_data = {
-                            'context_uri': selected[0]['context_uri'],
-                            'offset': {
-                                'uri': selected[0]['uri'],
-                            },
-                        }
-                    else:
-                        req_data = {
-                            'uris': [track['uri'] for track in selected],
-                        }
+            conf = click.confirm(
+                _get_conf_msg(cmd, search_type, indices_str),
+                default=True
+            )
+            if not conf:
+                pass
 
-                    play.callback(data=req_data)
+            elif cmd == 'p':
+                from cli.commands.play import play
+                req_data = _format_play_req(selected)
+                play.callback(data=req_data, wait=0.2)
 
             elif cmd == 'q':
-                conf = click.confirm('Queue the selected track/s? ({})'.format(indices_str), default=True)
-                if conf:
-                    requests = [
-                        {
-                            'endpoint': 'me/player/queue?uri=' + s['uri'],
-                            'method': 'POST',
-                        }
-                        for s in selected
-                    ]
-                    Spotify.multirequest(requests, delay_between=0.1)
-                    click.echo('{} track/s queued.'.format(len(selected)))
+                requests = _format_queue_reqs(selected)
+                Spotify.multirequest(requests, delay_between=0.1)
+                click.echo('{} {}/s queued.'.format(len(selected), search_type))
 
             else:
                 raise FeatureInDevelopment

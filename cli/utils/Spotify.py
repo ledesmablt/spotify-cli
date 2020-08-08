@@ -72,7 +72,7 @@ def refresh(auth_code=None):
     return refresh_data
 
 
-def _handle_request(endpoint, method='GET', data=None, headers={}, ignore_errs=[], handle_errs={}):
+def _handle_request(endpoint, method='GET', data=None, headers={}, ignore_errs=[], handle_errs={}, wait=0):
     if endpoint.startswith('/'):
         endpoint = endpoint[1:]
 
@@ -87,6 +87,7 @@ def _handle_request(endpoint, method='GET', data=None, headers={}, ignore_errs=[
         
     headers.update(DEFAULT_HEADERS)
     req = Request(url, data, headers, method=method)
+    time.sleep(wait)
     try:
         with urlopen(req) as res:
             if res.status == 200:
