@@ -29,7 +29,7 @@ def history(verbose=0, raw=False, limit=10, _return_parsed=False):
         if verbose >= 0:
             import json
             click.echo(json.dumps(pager.content))
-        
+
         return pager.content
 
     headers = ['Last played', 'Artist', 'Track']
@@ -40,15 +40,21 @@ def history(verbose=0, raw=False, limit=10, _return_parsed=False):
     for i, item in enumerate(pager.content['items']):
         parsed_item = parse_track_item_full(item['track'])
         row_dict = {
-            'Artist': cut_string(', '.join(parsed_item['artists']['names']), 30),
+            'Artist': cut_string(
+                ', '.join(parsed_item['artists']['names']), 30
+            ),
             'Track': cut_string(parsed_item['track']['name'], 50),
         }
 
         # last played parsing
         try:
-            played_at = datetime.strptime(item['played_at'], '%Y-%m-%dT%H:%M:%S.%fZ')
+            played_at = datetime.strptime(
+                item['played_at'], '%Y-%m-%dT%H:%M:%S.%fZ'
+            )
         except ValueError:
-            played_at = datetime.strptime(item['played_at'], '%Y-%m-%dT%H:%M:%SZ')
+            played_at = datetime.strptime(
+                item['played_at'], '%Y-%m-%dT%H:%M:%SZ'
+            )
 
         timediff = current_time - played_at
         timediff_hours = int(timediff.seconds / 3600)

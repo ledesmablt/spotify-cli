@@ -38,7 +38,10 @@ from ..utils.exceptions import *
     help='Turn repeat on (all/track) or off.'
 )
 @click.argument('keyword', type=str, required=False, metavar='[<keyword>]')
-def play(keyword=None, play_type='track', verbose=0, quiet=False, shuffle=None, repeat=None, *args, **kwargs):
+def play(
+    keyword=None, play_type='track', verbose=0, quiet=False,
+    shuffle=None, repeat=None, *args, **kwargs
+):
     """Resume playback or search for a track/album/playlist to play.
 
     Example: Use 'spotify play <keyword>' to search for and
@@ -60,7 +63,7 @@ def play(keyword=None, play_type='track', verbose=0, quiet=False, shuffle=None, 
         if len(pager.content['items']) == 0:
             click.echo('No results found for "{}"'.format(keyword), err=True)
             return
-        
+
         item = pager.content['items'][0]
         if play_type == 'track':
             kwargs['data'] = {
@@ -78,7 +81,6 @@ def play(keyword=None, play_type='track', verbose=0, quiet=False, shuffle=None, 
                 requests.append(
                     shuffle_cmd.callback(shuffle, _create_request=True)
                 )
-
 
     if shuffle:
         requests.append(

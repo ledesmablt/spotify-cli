@@ -63,7 +63,9 @@ def status(verbose=0, raw=False, _override={}, _return_parsed=False):
         music['artist'][key] = music['artist'][key + 's'][0]
         music['artist']['long_' + key] = ', '.join(music['artist'][key + 's'])
         if key != 'name':
-            music['artist']['long_' + key] = music['artist']['long_' + key].replace(' ','')
+            music['artist']['long_' + key] = (
+                music['artist']['long_' + key].replace(' ', '')
+            )
 
     playback_status = 'Playing' if data['is_playing'] else 'Paused'
     playback_options = []
@@ -129,6 +131,5 @@ def status(verbose=0, raw=False, _override={}, _return_parsed=False):
                 music['track']['url']
             )
         )
-
 
     return

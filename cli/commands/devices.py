@@ -40,29 +40,39 @@ def devices(verbose=False, switch_to='', raw=False):
         key=lambda x: (x['is_active'], x['type'], x['name'])
     )
     for device in devices_list:
-        device['formatted_name'] = '{} - {}'.format(device['name'], device['type'])
+        device['formatted_name'] = '{} - {}'.format(
+            device['name'], device['type']
+        )
 
     # output
     if not switch_to:
         if not verbose:
             output_list = map(
-                lambda x: '* ' + x['name'] if x['is_active'] else '  ' + x['name'],
+                lambda x: (
+                    '* ' + x['name'] if x['is_active']
+                    else '  ' + x['name']
+                ),
                 sorted(devices_list, key=lambda x: x['name'])
             )
             click.echo('\n'.join(output_list))
 
         else:
             output_list = map(
-                lambda x: '* ' + x['formatted_name'] if x['is_active'] else '  ' + x['formatted_name'],
+                lambda x: (
+                    '* ' + x['formatted_name'] if x['is_active']
+                    else '  ' + x['formatted_name']
+                ),
                 sorted(devices_list, key=lambda x: x['formatted_name'])
             )
             click.echo('\n'.join(output_list))
 
         return
 
-
     # switch-to handler
-    matched_devices = [x for x in devices_list if switch_to.lower() in x['formatted_name'].lower()]
+    matched_devices = [
+        x for x in devices_list
+        if switch_to.lower() in x['formatted_name'].lower()
+    ]
     num_matched = len(matched_devices)
     if num_matched != 1:
         if num_matched == 0:
@@ -70,16 +80,24 @@ def devices(verbose=False, switch_to='', raw=False):
             message = 'Please select a valid device.\n'
             choices = devices_list
         else:
-            click.echo('{} devices matched "{}".'.format(num_matched, switch_to))
+            click.echo(
+                '{} devices matched "{}".'
+                .format(num_matched, switch_to)
+            )
             message = 'Please select the device to activate.\n'
             choices = matched_devices
 
         choices = map(
             lambda x: {
                 'value': x['formatted_name'],
-                'name': x['formatted_name'] + ('' if not x['is_active'] else ' (active)'),
+                'name': x['formatted_name'] + (
+                    '' if not x['is_active'] else ' (active)'
+                ),
             },
-            sorted(choices, key=lambda x: (x['is_active'], x['formatted_name']))
+            sorted(
+                choices,
+                key=lambda x: (x['is_active'], x['formatted_name'])
+            )
         )
 
         # interactive prompt
@@ -94,8 +112,10 @@ def devices(verbose=False, switch_to='', raw=False):
         if not choice:
             return
 
-        matched_devices = [x for x in devices_list if choice['formatted_name'] == x['formatted_name']]
-
+        matched_devices = [
+            x for x in devices_list
+            if choice['formatted_name'] == x['formatted_name']
+        ]
 
     to_activate = matched_devices[0]
     if to_activate['is_active']:

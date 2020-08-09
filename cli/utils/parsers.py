@@ -12,6 +12,7 @@ def parse_track(track):
         'duration': format_duration_ms(track['duration_ms']),
     }
 
+
 def parse_album(album):
     return {
         'name': album['name'],
@@ -23,6 +24,7 @@ def parse_album(album):
         'total_tracks': album['total_tracks'],
     }
 
+
 def parse_artists(artists):
     assert type(artists) == list
     return {
@@ -30,6 +32,7 @@ def parse_artists(artists):
         'ids': [a['id'] for a in artists],
         'urls': [a['external_urls']['spotify'] for a in artists],
     }
+
 
 def parse_context(context):
     # playback context not available if private session or unnamed playlist
@@ -43,6 +46,7 @@ def parse_context(context):
         'api': context['href'],
         'uri': context['uri'],
     }
+
 
 def parse_track_item_full(item):
     return {

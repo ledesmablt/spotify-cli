@@ -17,8 +17,9 @@ for folder in [CONFIG_DIR, CREDS_DIR]:
         os.mkdir(folder)
 
 # auth
-REFRESH_URI = 'https://asia-east2-spotify-cli-283006.cloudfunctions.net/auth-refresh'
-REDIRECT_URI = 'https://asia-east2-spotify-cli-283006.cloudfunctions.net/auth-redirect'
+CLOUD_URI_PREFIX = 'https://asia-east2-spotify-cli-283006.cloudfunctions.net/'
+REFRESH_URI = CLOUD_URI_PREFIX + 'auth-refresh'
+REDIRECT_URI = CLOUD_URI_PREFIX + 'auth-redirect'
 CLIENT_ID = '3e96f0ef8d6d4e0994e15bf2b168235f'
 
 AUTH_SCOPES_MAPPING = [
@@ -32,7 +33,7 @@ AUTH_SCOPES_MAPPING = [
         ],
     },
     {
-        'value': 'playlists-read', 
+        'value': 'playlists-read',
         'name': 'Read user playlists.',
         'scopes': [
             'playlist-read-collaborative',
@@ -40,7 +41,7 @@ AUTH_SCOPES_MAPPING = [
         ],
     },
     {
-        'value': 'playlists-modify', 
+        'value': 'playlists-modify',
         'name': 'Modify user playlists.',
         'scopes': [
             'playlist-modify-public',
@@ -49,7 +50,10 @@ AUTH_SCOPES_MAPPING = [
     },
     {
         'value': 'user-read',
-        'name': 'Read user library, followed artists/users, and top artists/tracks.',
+        'name': (
+            'Read user library, followed artists/users, '
+            'and top artists/tracks.'
+        ),
         'scopes': [
             'user-top-read',
             'user-library-read',
@@ -64,4 +68,4 @@ AUTH_SCOPES_MAPPING = [
             'user-follow-modify',
         ],
     }
-] 
+]

@@ -25,5 +25,4 @@ def pause(verbose=0, quiet=False):
         from cli.commands.status import status
         status.callback(verbose=verbose, _override={'is_playing': False})
 
-
     return

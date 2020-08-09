@@ -15,12 +15,15 @@ def _read_json(file_path):
         data = json.load(f)
     return data
 
+
 def get_credentials():
     """Read locally stored credentials file for API authorization."""
     return _read_json(CREDS_PATH)
 
+
 def get_config():
     return _read_json(CONFIG_PATH)
+
 
 def update_config(update_dict):
     config = get_config()
@@ -72,7 +75,10 @@ def refresh(auth_code=None):
     return refresh_data
 
 
-def _handle_request(endpoint, method='GET', data=None, headers={}, ignore_errs=[], handle_errs={}, wait=0):
+def _handle_request(
+    endpoint, method='GET', data=None, headers={}, ignore_errs=[],
+    handle_errs={}, wait=0
+):
     if endpoint.startswith('/'):
         endpoint = endpoint[1:]
 
@@ -84,7 +90,7 @@ def _handle_request(endpoint, method='GET', data=None, headers={}, ignore_errs=[
 
     if data:
         data = json.dumps(data).encode('ascii')
-        
+
     headers.update(DEFAULT_HEADERS)
     req = Request(url, data, headers, method=method)
     time.sleep(wait)
@@ -127,8 +133,8 @@ def _handle_request(endpoint, method='GET', data=None, headers={}, ignore_errs=[
 
 
 def request(endpoint, *args, **kwargs):
-    """Request wrapper for Spotify API endpoints. Handles errors, authorization,
-    and refreshing access if needed.
+    """Request wrapper for Spotify API endpoints. Handles errors,
+    authorization, and refreshing access if needed.
     """
     access_token = get_credentials().get('access_token')
     if not access_token:
@@ -162,13 +168,18 @@ def multirequest(requests_arr=[], wait=False, delay_between=0):
 
 
 class Pager:
-    def __init__(self, endpoint, limit=20, offset=0, params={}, content_callback=None, *args, **kwargs):
+    def __init__(
+        self, endpoint, limit=20, offset=0, params={}, content_callback=None,
+        *args, **kwargs
+    ):
         limit = min(50, limit)
         self.endpoint = endpoint
         self._content_callback = content_callback
         self._args = args
         self._kwargs = kwargs
-        self._endpoint_formatted = endpoint + '?limit={}&offset={}'.format(limit, offset)
+        self._endpoint_formatted = (
+            endpoint + '?limit={}&offset={}'.format(limit, offset)
+        )
         if params:
             for k, v in params.items():
                 self._endpoint_formatted += '&{}={}'.format(k, v)

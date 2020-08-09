@@ -10,6 +10,7 @@ class AuthorizationError(ClickException):
         )
         super().__init__(self.message)
 
+
 class AuthScopeError(ClickException):
     def __init__(self, required_scope_key):
         from cli.utils.constants import AUTH_SCOPES_MAPPING
@@ -18,7 +19,7 @@ class AuthScopeError(ClickException):
                 lambda scope: scope['value'] == required_scope_key,
                 AUTH_SCOPES_MAPPING
             ))['name']
-        except:
+        except (IndexError, KeyError):
             raise Exception('Scope key not found')
 
         self.message = (
@@ -29,6 +30,7 @@ class AuthScopeError(ClickException):
             .format(required_scope_msg)
         )
         super().__init__(self.message)
+
 
 class TokenExpired(ClickException):
     def __init__(self):
@@ -53,6 +55,7 @@ class NoPlaybackError(ClickException):
         )
         super().__init__(self.message)
 
+
 class InvalidVolumeInput(ClickException):
     def __init__(self):
         self.message = (
@@ -60,6 +63,7 @@ class InvalidVolumeInput(ClickException):
             'Example: spotify volume up 15'
         )
         super().__init__(self.message)
+
 
 class DeviceOperationRestricted(ClickException):
     def __init__(self):
@@ -76,15 +80,21 @@ class FeatureInDevelopment(ClickException):
         )
         super().__init__(self.message)
 
+
 class PodcastNotSupported(ClickException):
     def __init__(self):
         self.message = 'Podcasts are not supported.'
         super().__init__(self.message)
 
+
 class ConnectionError(ClickException):
     def __init__(self):
-        self.message = 'Could not establish an internet connection. Please connect and try again.'
+        self.message = (
+            'Could not establish an internet connection.\n'
+            'Please connect and try again.'
+        )
         super().__init__(self.message)
+
 
 class InvalidInput(ClickException):
     def __init__(self, helpmsg=''):
@@ -95,6 +105,7 @@ class InvalidInput(ClickException):
 class PagerLimitReached(Exception):
     """Results limit reached."""
     pass
+
 
 class PagerPreviousUnavailable(Exception):
     """Previous page not available."""

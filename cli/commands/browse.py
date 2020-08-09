@@ -42,7 +42,6 @@ def browse(browse_type, verbose=0, quiet=False):
         if browse_type != 'artist':
             name = '"{}" by {}'.format(name, music['artist']['name'])
 
-
     elif browse_type == 'playlist':
         # playlist and radio are both type 'playlist'
         if music['context']['type'] != 'playlist':

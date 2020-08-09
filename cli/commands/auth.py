@@ -25,11 +25,17 @@ def login():
             'checked': scope['name'] in enabled_scopes,
         })
 
-    click.echo('By default, spotify-cli will enable reading & modifying the playback state.\n')
+    click.echo(
+        'By default, spotify-cli will enable reading & '
+        'modifying the playback state.\n'
+    )
     choice = prompt([{
         'type': 'checkbox',
         'name': 'scopes',
-        'message': 'Please select which additional features you want to authorize.',
+        'message': (
+            'Please select which additional features '
+            'you want to authorize.'
+        ),
         'choices': choices,
     }])
     if not choice:
@@ -46,7 +52,10 @@ def login():
     # handle auth and save credentials
     url = build_auth_url(additional_scopes)
     webbrowser.open(url)
-    click.echo('\nGo to the following link in your browser:\n\n\t{}\n'.format(url))
+    click.echo(
+        '\nGo to the following link in your browser:\n\n\t{}\n'
+        .format(url)
+    )
     auth_code = input('Enter verification code: ')
     click.echo('\nObtaining access token...')
     Spotify.refresh(auth_code)
@@ -77,6 +86,7 @@ def status(verbose):
 def auth():
     """Manage user authentication for spotify-cli."""
     pass
+
 
 auth.add_command(login)
 auth.add_command(status)

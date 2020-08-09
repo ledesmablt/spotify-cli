@@ -4,7 +4,10 @@ from flask import jsonify
 
 
 REFRESH_URL = 'https://accounts.spotify.com/api/token'
-REDIRECT_URI = 'https://asia-east2-spotify-cli-283006.cloudfunctions.net/auth-redirect'
+REDIRECT_URI = (
+    'https://asia-east2-spotify-cli-283006.cloudfunctions.net/'
+    'auth-redirect'
+)
 with open('credentials.json') as f:
     CREDENTIALS = json.load(f)
 

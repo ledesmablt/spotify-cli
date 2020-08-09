@@ -55,12 +55,12 @@ def queue(keyword, queue_type='track', yes=False, verbose=0, quiet=False):
 
         item = pager.content['items'][0]
 
-
     # parse command and playback context
     display_str = '{} - {}{}'.format(
         cut_string(item['name'], 50),
         cut_string(', '.join(parse_artists(item['artists'])['names']), 30),
-        '' if queue_type == 'track' else ' ({} tracks)'.format(item['total_tracks']),
+        '' if queue_type == 'track'
+        else ' ({} tracks)'.format(item['total_tracks']),
     )
 
     # handle confirmation & request
@@ -83,11 +83,10 @@ def queue(keyword, queue_type='track', yes=False, verbose=0, quiet=False):
         {
             'endpoint': 'me/player/queue?uri=' + uri,
             'method': 'POST',
-        } 
+        }
         for uri in uris
     ]
     Spotify.multirequest(requests, delay_between=0.25)
-
 
     # print output
     if not quiet:

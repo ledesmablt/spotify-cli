@@ -36,7 +36,6 @@ def volume(mode, amount):
         elif new_volume < 0:
             new_volume = 0
 
-
     Spotify.request(
         'me/player/volume?volume_percent={}'.format(new_volume),
         method='PUT',

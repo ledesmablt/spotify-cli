@@ -30,6 +30,7 @@ from cli.commands.search import search
 def cli():
     pass
 
+
 # commands
 cli.add_command(auth)
 cli.add_command(status)

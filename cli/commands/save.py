@@ -61,7 +61,6 @@ def save(keyword, save_type, yes, verbose=0, quiet=False):
 
         music = pager.content['items'][0]
 
-
     # parse command and playback context
     if keyword == '.' and save_type != 'playlist':
         music = music[save_type]
@@ -70,19 +69,23 @@ def save(keyword, save_type, yes, verbose=0, quiet=False):
         id_str = music['id']
         name = '{} - {}'.format(
             cut_string(music['name'], 50),
-            cut_string(', '.join(parse_artists(music['artists'])['names']), 30),
+            cut_string(
+                ', '.join(parse_artists(music['artists'])['names']), 30
+            ),
         )
 
     elif save_type == 'artist':
         id_str = music['id']
         name = music['name']
 
-
     elif save_type == 'playlist':
         # playlist and radio are both type 'playlist'
         if keyword == '.':
             if music['context']['type'] != 'playlist':
-                click.echo('Error: Current session is not a playlist.', err=True)
+                click.echo(
+                    'Error: Current session is not a playlist.',
+                    err=True
+                )
                 return
 
             id_str = music['context']['id']
@@ -90,7 +93,6 @@ def save(keyword, save_type, yes, verbose=0, quiet=False):
         else:
             id_str = music['id']
             name = music['name']
-
 
     # format endpoint
     data = None

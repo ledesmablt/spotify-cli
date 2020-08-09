@@ -41,7 +41,10 @@ from ..utils.exceptions import *
 @click.argument(
     'keyword', type=str, metavar='<keyword>'
 )
-def search(keyword, search_type='all', verbose=0, raw=False, limit=10, _return_parsed=False):
+def search(
+    keyword, search_type='all', verbose=0,
+    raw=False, limit=10, _return_parsed=False
+):
     """Search for any Spotify content."""
     import urllib.parse as ul
     from tabulate import tabulate
@@ -59,9 +62,8 @@ def search(keyword, search_type='all', verbose=0, raw=False, limit=10, _return_p
         if verbose >= 0:
             import json
             click.echo(json.dumps(pager.content))
-        
-        return pager.content
 
+        return pager.content
 
     commands = {
         0: ['[p]lay', '[q]ueue', '[s]ave'],
@@ -74,34 +76,66 @@ def search(keyword, search_type='all', verbose=0, raw=False, limit=10, _return_p
         commands[0] = ['[p]lay', '[s]ave']
         commands.pop(1)
 
-
     def _get_headers():
         if search_type == 'track':
             return [['Track', 'Artist'], None]
         elif search_type == 'album':
             return [['Album', 'Artist', '# of tracks'], None]
         elif search_type == 'artist':
-            return [['Artist', 'Genre', 'Followers'], ['left', 'left', 'right']]
+            return [
+                ['Artist', 'Genre', 'Followers'],
+                ['left', 'left', 'right']
+            ]
         elif search_type == 'playlist':
             return [['Playlist', 'Created by', '# of tracks'], None]
 
     def _get_conf_msg(cmd, search_type, indices_str):
         mapping = {
             'p': {
-                'track': 'Play the selected track/s? ({})'.format(indices_str),
-                'album': 'Play the selected album? ({})'.format(indices_str.split(',')[0]),
-                'playlist': 'Play the selected playlist? ({})'.format(indices_str.split(',')[0]),
+                'track': (
+                    'Play the selected track/s? ({})'
+                    .format(indices_str)
+                ),
+                'album': (
+                    'Play the selected album? ({})'
+                    .format(indices_str.split(',')[0])
+                ),
+                'playlist': (
+                    'Play the selected playlist? ({})'
+                    .format(indices_str.split(',')[0])
+                ),
             },
             'q': {
-                'track': 'Queue the selected track/s? ({})'.format(indices_str),
-                'album': 'Queue the selected album? ({})'.format(indices_str.split(',')[0]),
-                'playlist': 'Queue the selected playlist? ({})'.format(indices_str.split(',')[0]),
+                'track': (
+                    'Queue the selected track/s? ({})'
+                    .format(indices_str)
+                ),
+                'album': (
+                    'Queue the selected album? ({})'
+                    .format(indices_str.split(',')[0])
+                ),
+                'playlist': (
+                    'Queue the selected playlist? ({})'
+                    .format(indices_str.split(',')[0])
+                ),
             },
             's': {
-                'track': 'Save the selected track/s? ({})'.format(indices_str),
-                'artist': 'Save the selected artist/s? ({})'.format(indices_str),
-                'album': 'Save the selected album/s? ({})'.format(indices_str),
-                'playlist': 'Save the selected playlist/s? ({})'.format(indices_str),
+                'track': (
+                    'Save the selected track/s? ({})'
+                    .format(indices_str)
+                ),
+                'artist': (
+                    'Save the selected artist/s? ({})'
+                    .format(indices_str)
+                ),
+                'album': (
+                    'Save the selected album/s? ({})'
+                    .format(indices_str)
+                ),
+                'playlist': (
+                    'Save the selected playlist/s? ({})'
+                    .format(indices_str)
+                ),
             }
         }
         cmd_map = mapping.get(cmd)
@@ -110,7 +144,10 @@ def search(keyword, search_type='all', verbose=0, raw=False, limit=10, _return_p
 
         output = cmd_map.get(search_type)
         if not output:
-            raise InvalidInput('\nCommand not supported for {} search.'.format(search_type))
+            raise InvalidInput(
+                '\nCommand not supported for {} search.'
+                .format(search_type)
+            )
         else:
             return output
 
@@ -128,7 +165,9 @@ def search(keyword, search_type='all', verbose=0, raw=False, limit=10, _return_p
         elif search_type == 'album':
             output = {
                 'Album': cut_string(item['name'], 50),
-                'Artist': cut_string(', '.join([a['name'] for a in item['artists']]), 30),
+                'Artist': cut_string(
+                    ', '.join([a['name'] for a in item['artists']]), 30
+                ),
                 '# of tracks': item.get('total_tracks', 0),
                 'uri': item['uri'],
                 'id': item['id'],
@@ -144,7 +183,9 @@ def search(keyword, search_type='all', verbose=0, raw=False, limit=10, _return_p
         elif search_type == 'playlist':
             output = {
                 'Playlist': cut_string(item['name'], 50),
-                'Created by': cut_string(item['owner'].get('display_name'), 30),
+                'Created by': cut_string(
+                    item['owner'].get('display_name'), 30
+                ),
                 '# of tracks': item['tracks'].get('total', 0),
                 'uri': item['uri'],
                 'id': item['id'],
@@ -204,8 +245,11 @@ def search(keyword, search_type='all', verbose=0, raw=False, limit=10, _return_p
             r = base_req.copy()
             if search_type in ['track', 'album']:
                 r['endpoint'] = 'me/{}s?ids={}'.format(search_type, s['id'])
-            elif search_type =='artist':
-                r['endpoint'] = 'me/following?type=artist&ids={}'.format(s['id'])
+            elif search_type == 'artist':
+                r['endpoint'] = (
+                    'me/following?type=artist&ids={}'
+                    .format(s['id'])
+                )
             elif search_type == 'playlist':
                 r['endpoint'] = 'playlists/{}/followers'.format(s['id'])
                 r['data'] = {'public': True}
@@ -214,8 +258,7 @@ def search(keyword, search_type='all', verbose=0, raw=False, limit=10, _return_p
 
         return requests
 
-
-    headers, colalign =  _get_headers()
+    headers, colalign = _get_headers()
     headers.insert(0, '#')
     if colalign:
         colalign.insert(0, 'right')
@@ -226,6 +269,7 @@ def search(keyword, search_type='all', verbose=0, raw=False, limit=10, _return_p
     )
     parsed_content = {}
     end_search = False
+
     def _display_input_err():
         click.echo(
             '\nInput error! Please try again.\n'
@@ -288,7 +332,7 @@ def search(keyword, search_type='all', verbose=0, raw=False, limit=10, _return_p
             for i in indices:
                 try:
                     selected.append(parsed_content[int(i)])
-                except:
+                except (ValueError, IndexError):
                     continue
 
             # parse command
@@ -311,23 +355,32 @@ def search(keyword, search_type='all', verbose=0, raw=False, limit=10, _return_p
                 from cli.commands.play import play
                 req_data = _format_play_req(selected)
                 play.callback(data=req_data, quiet=True)
-                click.echo('Now playing: {}'.format(selected[0][search_type.capitalize()]))
+                click.echo(
+                    'Now playing: {}'
+                    .format(selected[0][search_type.capitalize()])
+                )
 
             elif cmd == 'q':
                 requests = _format_queue_reqs(selected)
                 Spotify.multirequest(requests, delay_between=0.1)
-                click.echo('{} {}/s queued.'.format(len(selected), search_type))
+                click.echo(
+                    '{} {}/s queued.'
+                    .format(len(selected), search_type)
+                )
 
             elif cmd == 's':
                 requests = _format_save_reqs(selected)
                 reqs = Spotify.multirequest(requests)
-                click.echo('{} {}/s saved.'.format(len(selected), search_type))
+                click.echo(
+                    '{} {}/s saved.'
+                    .format(len(selected), search_type)
+                )
 
             else:
                 raise FeatureInDevelopment
 
-            end_search = not click.confirm('\nContinue searching?', default=True)
-
+            end_search = not click.confirm(
+                '\nContinue searching?', default=True
+            )
 
     return
-

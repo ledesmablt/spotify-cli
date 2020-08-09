@@ -11,7 +11,9 @@ setup(
     version=VERSION,
     author='Benj Ledesma',
     author_email='benj.ledesma@gmail.com',
-    description='Control Spotify playback on any device through the command line.',
+    description=(
+        'Control Spotify playback on any device through the command line.'
+    ),
     long_description=long_description,
     long_description_content_type='text/markdown',
     url='https://github.com/ledesmablt/spotify-cli',

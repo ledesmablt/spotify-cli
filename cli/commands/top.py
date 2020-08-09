@@ -19,7 +19,10 @@ from ..utils.exceptions import *
     '-t', '--time',
     default='medium',
     type=click.Choice(['short', 'medium', 'long'], case_sensitive=False),
-    help='Specify the timeframe for your top tracks/artists (default: medium).',
+    help=(
+        'Specify the timeframe for your top '
+        'tracks/artists (default: medium).'
+    ),
     metavar='<int>'
 )
 @click.option(
@@ -40,13 +43,13 @@ def top(top_type, time, verbose=0, raw=False, limit=10, _return_parsed=False):
     pager = Spotify.Pager(
         'me/top/{}'.format(top_type),
         limit=limit,
-        params={'time_range': time+ '_term'}
+        params={'time_range': time+'_term'}
     )
     if raw:
         if verbose >= 0:
             import json
             click.echo(json.dumps(pager.content))
-        
+
         return pager.content
 
     if top_type == 'tracks':
@@ -60,7 +63,9 @@ def top(top_type, time, verbose=0, raw=False, limit=10, _return_parsed=False):
             parsed_item = parse_track_item_full(item)
             row_dict = {
                 '#': i+1,
-                'Artist': cut_string(', '.join(parsed_item['artists']['names']), 30),
+                'Artist': cut_string(
+                    ', '.join(parsed_item['artists']['names']), 30
+                ),
                 'Track': cut_string(parsed_item['track']['name'], 50),
             }
         elif top_type == 'artists':
