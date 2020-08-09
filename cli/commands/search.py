@@ -77,13 +77,13 @@ def search(keyword, search_type='all', verbose=0, raw=False, limit=10, _return_p
 
     def _get_headers():
         if search_type == 'track':
-            return ['Track', 'Artist']
+            return [['Track', 'Artist'], None]
         elif search_type == 'album':
-            return ['Album', 'Artist']
+            return [['Album', 'Artist', '# of tracks'], None]
         elif search_type == 'artist':
-            return ['Artist']
+            return [['Artist', 'Genre', 'Followers'], ['left', 'left', 'right']]
         elif search_type == 'playlist':
-            return ['Playlist', 'Created by', '# of tracks']
+            return [['Playlist', 'Created by', '# of tracks'], None]
 
     def _get_conf_msg(cmd, search_type, indices_str):
         mapping = {
@@ -99,6 +99,7 @@ def search(keyword, search_type='all', verbose=0, raw=False, limit=10, _return_p
             },
             's': {
                 'track': 'Save the selected track/s? ({})'.format(indices_str),
+                'artist': 'Save the selected artist/s? ({})'.format(indices_str),
                 'album': 'Save the selected album/s? ({})'.format(indices_str),
                 'playlist': 'Save the selected playlist/s? ({})'.format(indices_str),
             }
@@ -128,12 +129,15 @@ def search(keyword, search_type='all', verbose=0, raw=False, limit=10, _return_p
             output = {
                 'Album': cut_string(item['name'], 50),
                 'Artist': cut_string(', '.join([a['name'] for a in item['artists']]), 30),
+                '# of tracks': item.get('total_tracks', 0),
                 'uri': item['uri'],
                 'id': item['id'],
             }
         elif search_type == 'artist':
             output = {
                 'Artist': item['name'],
+                'Genre': cut_string(', '.join(item.get('genres', '')), 30),
+                'Followers': '{:,}'.format(item['followers'].get('total', 0)),
                 'uri': item['uri'],
                 'id': item['id'],
             }
@@ -211,7 +215,11 @@ def search(keyword, search_type='all', verbose=0, raw=False, limit=10, _return_p
         return requests
 
 
-    headers = ['#'] + _get_headers()
+    headers, colalign =  _get_headers()
+    headers.insert(0, '#')
+    if colalign:
+        colalign.insert(0, 'right')
+
     click.echo(
         '\nSearch results for "{}"'
         .format(keyword, int(pager.offset / pager.limit) + 1)
@@ -241,7 +249,7 @@ def search(keyword, search_type='all', verbose=0, raw=False, limit=10, _return_p
             return
 
         click.echo('\n', nl=False)
-        click.echo(tabulate(table, headers=headers))
+        click.echo(tabulate(table, headers=headers, colalign=colalign))
         response = click.prompt(
             '\nActions:\n'
             '[n]ext/[b]ack\n'
