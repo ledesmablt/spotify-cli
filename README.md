@@ -6,7 +6,7 @@ Control Spotify playback on any device through the command line.
 
 This package only supports Python 3 and above.
 ```
-$ pip3 install spotify-cli
+$ pip3 install --upgrade spotify-cli
 ```
 
 ## Usage
