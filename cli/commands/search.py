@@ -93,6 +93,11 @@ def search(keyword, search_type='all', verbose=0, raw=False, limit=10, _return_p
                 'track': 'Queue the selected track/s? ({})'.format(indices_str),
                 'album': 'Queue the selected album? ({})'.format(indices_str.split(',')[0]),
                 'playlist': 'Queue the selected playlist? ({})'.format(indices_str.split(',')[0]),
+            },
+            's': {
+                'track': 'Save the selected track/s? ({})'.format(indices_str),
+                'album': 'Save the selected album/s? ({})'.format(indices_str),
+                'playlist': 'Save the selected playlist/s? ({})'.format(indices_str),
             }
         }
         cmd_map = mapping.get(cmd)
@@ -112,6 +117,7 @@ def search(keyword, search_type='all', verbose=0, raw=False, limit=10, _return_p
                 'Track': cut_string(item['track']['name'], 50),
                 'Artist': cut_string(', '.join(item['artists']['names']), 30),
                 'uri': item['track']['uri'],
+                'id': item['track']['id'],
                 'context_uri': item['album']['uri'],
                 'track_number': item['track']['track_number'],
             }
@@ -178,6 +184,28 @@ def search(keyword, search_type='all', verbose=0, raw=False, limit=10, _return_p
                 }
                 for track in album['tracks']['items']
             ]
+
+    def _format_save_reqs(selected):
+        base_req = {
+            'method': 'PUT',
+            'handle_errs': {
+                403: (AuthScopeError, {'required_scope_key': 'user-modify'})
+            }
+        }
+        requests = []
+        for s in selected:
+            r = base_req.copy()
+            if search_type in ['track', 'album']:
+                r['endpoint'] = 'me/{}s?ids={}'.format(search_type, s['id'])
+            elif search_type =='artist':
+                r['endpoint'] = 'me/following?type=artist&ids={}'.format(s['id'])
+            elif search_type == 'playlist':
+                r['endpoint'] = 'playlists/{}/followers'.format(s['id'])
+                r['data'] = {'public': True}
+
+            requests.append(r)
+
+        return requests
 
 
     headers = ['#'] + _get_headers()
@@ -269,6 +297,11 @@ def search(keyword, search_type='all', verbose=0, raw=False, limit=10, _return_p
                 requests = _format_queue_reqs(selected)
                 Spotify.multirequest(requests, delay_between=0.1)
                 click.echo('{} {}/s queued.'.format(len(selected), search_type))
+
+            elif cmd == 's':
+                requests = _format_save_reqs(selected)
+                reqs = Spotify.multirequest(requests)
+                click.echo('{} {}/s saved.'.format(len(selected), search_type))
 
             else:
                 raise FeatureInDevelopment
