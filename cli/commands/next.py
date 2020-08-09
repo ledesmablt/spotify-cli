@@ -14,7 +14,7 @@ from ..utils.exceptions import NoPlaybackError
     help='Suppress output.'
 )
 def _next(verbose=0, quiet=False):
-    """Play the next song in the queue."""
+    """Play the next track in the queue."""
     Spotify.request(
         'me/player/next', method='POST',
         handle_errs={404: NoPlaybackError}

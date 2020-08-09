@@ -14,7 +14,7 @@ from ..utils.exceptions import NoPlaybackError
     help='Suppress output.'
 )
 def previous(verbose=0, quiet=False):
-    """Play the previous song in the queue."""
+    """Play the previous track in the queue."""
     Spotify.request(
         'me/player/previous', method='POST',
         handle_errs={404: NoPlaybackError}

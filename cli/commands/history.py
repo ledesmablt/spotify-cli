@@ -77,7 +77,7 @@ def history(verbose=0, raw=False, limit=10, _return_parsed=False):
         table.append(row)
 
     if len(table) == 0:
-        click.echo('No data available for recently played songs.', err=True)
+        click.echo('No data available for recently played tracks.', err=True)
         return
 
     click.echo(tabulate(table, headers=headers))

@@ -32,10 +32,10 @@ Commands:
   browse    Open the current track, album, artist, or playlist in the...
   devices   Manage active devices.
   history   List your recently played tracks.
-  next      Play the next song in the queue.
+  next      Play the next track in the queue.
   pause     Pause playback.
   play      Resume playback or search for a track/album/playlist to play.
-  previous  Play the previous song in the queue.
+  previous  Play the previous track in the queue.
   queue     Add a track or album to your queue.
   repeat    Turn repeat on (all/track) or off.
   save      Save a track, album, artist, or playlist.
@@ -55,7 +55,7 @@ Playing: Nights
          Frank Ocean - Blonde
 
 $ spotify status -vv
-Song    Nights (03:31 / 05:07)
+Track   Nights (03:31 / 05:07)
 Artist  Frank Ocean
 Album   Blonde
 Status  Playing (on repeat, 60% volume)
