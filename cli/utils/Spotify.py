@@ -103,12 +103,6 @@ def _handle_request(endpoint, method='GET', data=None, headers={}, ignore_errs=[
             elif res.status == 204:
                 return {}
 
-    except URLError as e:
-        if 'Temporary failure in name resolution' in str(e.reason):
-            raise ConnectionError
-        else:
-            raise e
-
     except HTTPError as e:
         if e.status in ignore_errs:
             pass
@@ -124,6 +118,12 @@ def _handle_request(endpoint, method='GET', data=None, headers={}, ignore_errs=[
             raise TokenExpired
         else:
             raise SpotifyAPIError(message=e.msg, status=e.status)
+
+    except URLError as e:
+        if 'Temporary failure in name resolution' in str(e.reason):
+            raise ConnectionError
+        else:
+            raise e
 
 
 def request(endpoint, *args, **kwargs):
