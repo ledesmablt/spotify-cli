@@ -3,23 +3,21 @@ import click
 from ..utils import Spotify
 from ..utils.functions import retry
 from ..utils.exceptions import *
+from ..utils.exceptions import *
 
 
 @click.command(options_metavar='[<options>]')
 @click.option(
-    '--track', type=str,
-    help='Search for a track to play.',
-    metavar='<keyword>'
+    '--track', 'play_type', flag_value='track', default=True,
+    help='(default) Play a track.'
 )
 @click.option(
-    '--album', type=str,
-    help='Search for an album to play.',
-    metavar='<keyword>'
+    '--album', 'play_type', flag_value='album',
+    help='Play an album'
 )
 @click.option(
-    '--playlist', type=str,
-    help='Search for a playlist to play.',
-    metavar='<keyword>'
+    '--playlist', 'play_type', flag_value='playlist',
+    help='Play a playlist'
 )
 @click.option(
     '-v', '--verbose', count=True,
@@ -39,52 +37,39 @@ from ..utils.exceptions import *
     type=click.Choice(['all', 'track', 'off'], case_sensitive=False),
     help='Turn repeat on (all/track) or off.'
 )
-def play(
-    verbose=0, quiet=False, shuffle=None, repeat=None,
-    track=None, album=None, playlist=None,
-    *args, **kwargs
-):
-    """Resume playback."""
+@click.argument('keyword', type=str, required=False, metavar='[<keyword>]')
+def play(keyword=None, play_type='track', verbose=0, quiet=False, shuffle=None, repeat=None, *args, **kwargs):
+    """Resume playback or search for a track/album/playlist to play.
+
+    Example: Use 'spotify play <keyword>' to search for and
+    play a track matching <keyword>.
+    """
     from cli.commands.shuffle import shuffle as shuffle_cmd
 
-    is_search = True
-    keywords = ''
     requests = []
-    if track:
-        search_type = 'track'
-        keywords = track
-    elif album:
-        search_type = 'album'
-        keywords = album
-    elif playlist:
-        search_type = 'playlist'
-        keywords = playlist
-    else:
-        is_search = False
-
-    if is_search:
+    if keyword:
         import urllib.parse as ul
         pager = Spotify.Pager(
             'search',
             params={
-                'q': ul.quote_plus(keywords),
-                'type': search_type,
+                'q': ul.quote_plus(keyword),
+                'type': play_type,
             },
-            content_callback=lambda c: c[search_type+'s'],
+            content_callback=lambda c: c[play_type+'s'],
         )
         if len(pager.content['items']) == 0:
-            click.echo('No results found for "{}"'.format(keywords), err=True)
+            click.echo('No results found for "{}"'.format(keyword), err=True)
             return
         
         item = pager.content['items'][0]
-        if search_type == 'track':
+        if play_type == 'track':
             kwargs['data'] = {
                 'context_uri': item['album']['uri'],
                 'offset': {
                     'uri': item['uri'],
                 },
             }
-        elif search_type in ['album', 'playlist']:
+        elif play_type in ['album', 'playlist']:
             kwargs['data'] = {
                 'context_uri': item['uri'],
             }
