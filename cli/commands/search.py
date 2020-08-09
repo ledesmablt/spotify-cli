@@ -1,3 +1,5 @@
+import time
+
 import click
 
 from ..utils import Spotify
@@ -25,7 +27,8 @@ from ..utils.exceptions import *
 )
 @click.option(
     '-l', '--limit', type=int, default=10,
-    help='Number of items to show.'
+    help='Number of items to show.',
+    metavar='<int>'
 )
 @click.option(
     '-v', '--verbose', count=True,
@@ -215,6 +218,15 @@ def search(keyword, search_type='all', verbose=0, raw=False, limit=10, _return_p
     )
     parsed_content = {}
     end_search = False
+    def _display_input_err():
+        click.echo(
+            '\nInput error! Please try again.\n'
+            'Format: <command> <#s comma delimited>\n'
+            'Example: q 3,2,1',
+            err=True
+        )
+        time.sleep(3)
+
     while not end_search:
         table = []
         for i, item in enumerate(pager.content['items']):
@@ -260,7 +272,7 @@ def search(keyword, search_type='all', verbose=0, raw=False, limit=10, _return_p
             try:
                 indices_str = response.split(' ')[1]
             except IndexError:
-                click.echo('\nInput error! Please try again.', err=True)
+                _display_input_err()
                 continue
 
             indices = indices_str.split(',')
@@ -274,7 +286,7 @@ def search(keyword, search_type='all', verbose=0, raw=False, limit=10, _return_p
             # parse command
             click.echo('\n', nl=False)
             if len(selected) == 0:
-                click.echo('\nInput error! Please try again.', err=True)
+                _display_input_err()
                 continue
 
             try:
