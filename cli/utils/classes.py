@@ -2,6 +2,10 @@ from click import Group
 
 
 class AliasedGroup(Group):
+    """Class for supporting aliased click groups.
+
+    Example: spotify v -> spotify volume
+    """
 
     def get_command(self, ctx, cmd_name):
         rv = Group.get_command(self, ctx, cmd_name)

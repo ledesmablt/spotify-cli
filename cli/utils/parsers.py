@@ -1,3 +1,4 @@
+"""Functions for parsing Spotify API objects."""
 from .functions import *
 
 

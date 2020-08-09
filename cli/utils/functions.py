@@ -7,6 +7,7 @@ from .constants import *
 
 
 def format_duration_ms(ms):
+    """Format milliseconds (int) to a human-readable string."""
     def _format(d):
         d = str(d)
         if len(d) == 1:
@@ -22,6 +23,7 @@ def format_duration_ms(ms):
 
 
 def build_auth_url(additional_scopes=[]):
+    """Create the OAuth URL for the user-approved scopes."""
     user_scopes = ['default'] + additional_scopes
     scopes = []
     for scope in AUTH_SCOPES_MAPPING:
@@ -42,6 +44,7 @@ def build_auth_url(additional_scopes=[]):
 
 
 def cut_string(string, limit=30):
+    """Shorten the length of longer strings."""
     if len(string) <= limit:
         return string
     else:
@@ -49,6 +52,7 @@ def cut_string(string, limit=30):
 
 
 def retry(callback, retries, sleep=0.5, catch=Exception, *args, **kwargs):
+    """Handler for retries and exponental backoff."""
     r = 0
     while r < retries:
         r += 1

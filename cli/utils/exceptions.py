@@ -1,3 +1,4 @@
+"""Custom exceptions."""
 from click import ClickException
 
 
