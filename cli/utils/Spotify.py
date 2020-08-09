@@ -1,7 +1,7 @@
 import os
 import json
 import time
-from urllib.error import HTTPError
+from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
 from .constants import *
@@ -102,6 +102,12 @@ def _handle_request(endpoint, method='GET', data=None, headers={}, ignore_errs=[
 
             elif res.status == 204:
                 return {}
+
+    except URLError as e:
+        if 'Temporary failure in name resolution' in str(e.reason):
+            raise ConnectionError
+        else:
+            raise e
 
     except HTTPError as e:
         if e.status in ignore_errs:

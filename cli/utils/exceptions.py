@@ -81,6 +81,11 @@ class PodcastNotSupported(ClickException):
         self.message = 'Podcasts are not supported.'
         super().__init__(self.message)
 
+class ConnectionError(ClickException):
+    def __init__(self):
+        self.message = 'Could not establish an internet connection. Please connect and try again.'
+        super().__init__(self.message)
+
 class InvalidInput(ClickException):
     def __init__(self, helpmsg=''):
         self.message = 'Invalid input!' + helpmsg
