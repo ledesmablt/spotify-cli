@@ -63,10 +63,10 @@ Status  Playing (on repeat, 60% volume)
 Device  Lorenzo (Smartphone)
 URL:    https://open.spotify.com/track/7eqoqGkKwgOaWNNHx90uEZ
 
-$ spotify vol --up 20
+$ spotify vol up 20
 Volume set to 80%
 
-$ spotify vol --to 100
+$ spotify vol to 100
 Volume set to 100%
 ```
 
@@ -87,7 +87,7 @@ Switched to LENOVO - Computer
 ```
 
 Search for a track to play, queue, or save.
-```bash
+```
 $ spotify search "red velvet"
 
 Search results for "red velvet"
@@ -97,8 +97,8 @@ Search results for "red velvet"
   1  Psycho                                     Red Velvet
   2  Monster                                    Red Velvet - IRENE & SEULGI
   3  Bad Boy                                    Red Velvet
-  4  빨간 맛 Red Flavor                         Red Velvet
-  5  피카부 Peek-A-Boo                          Red Velvet
+  4  빨간 맛 Red Flavor                          Red Velvet
+  5  피카부 Peek-A-Boo                           Red Velvet
   6  Naughty                                    Red Velvet - IRENE & SEULGI
   7  Power Up                                   Red Velvet
   8  Dumb Dumb                                  Red Velvet
@@ -117,8 +117,8 @@ Queue the selected track/s? (1,4,5) [Y/n]: Y
 Continue searching? [Y/n]:
 ```
 
-Some commands support search queries (play, queue, save).
-```bash
+Some commands support search queries (`play`, `queue`, `save`).
+```
 $ spotify play "red velvet"
 Playing: Psycho
          Red Velvet - ‘The ReVe Festival’ Finale
