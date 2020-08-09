@@ -9,6 +9,7 @@ from .exceptions import *
 
 
 def _read_json(file_path):
+    """Helper function for reading .json files (for CLI config)."""
     if not os.path.exists(file_path):
         return {}
     with open(file_path) as f:
@@ -22,10 +23,12 @@ def get_credentials():
 
 
 def get_config():
+    """Read locally stored config file for spotify-cli."""
     return _read_json(CONFIG_PATH)
 
 
 def update_config(update_dict):
+    """Update locally stored config file for spotify-cli."""
     config = get_config()
     config.update(update_dict)
     with open(CONFIG_PATH, 'w+') as f:
@@ -36,8 +39,8 @@ def update_config(update_dict):
 def refresh(auth_code=None):
     """Refresh Spotify access token.
 
-    Optional arguments:
-    auth_code -- if supplied, pulls new access and refresh tokens.
+    Args:
+        auth_code (str): if supplied, pulls new access and refresh tokens.
     """
     post_data = {}
     if auth_code:
@@ -79,6 +82,9 @@ def _handle_request(
     endpoint, method='GET', data=None, headers={}, ignore_errs=[],
     handle_errs={}, wait=0
 ):
+    """Abstraction for handling requests to the Spotify API
+    with support for handling specific HTTP errors
+    ."""
     if endpoint.startswith('/'):
         endpoint = endpoint[1:]
 
@@ -154,6 +160,9 @@ def request(endpoint, *args, **kwargs):
 
 
 def multirequest(requests_arr=[], wait=False, delay_between=0):
+    """Wrapper around the request function for
+    multithreaded requests.
+    """
     from concurrent.futures import ThreadPoolExecutor
     executor = ThreadPoolExecutor(max_workers=5)
     futures = []
@@ -168,6 +177,8 @@ def multirequest(requests_arr=[], wait=False, delay_between=0):
 
 
 class Pager:
+    """State handler for page-like objects (i.e. search results)
+    from the Spotify API."""
     def __init__(
         self, endpoint, limit=20, offset=0, params={}, content_callback=None,
         *args, **kwargs
@@ -189,6 +200,7 @@ class Pager:
         return
 
     def _update_from_content(self):
+        """Update the Pager's properties based on the request content."""
         if self._content_callback:
             self.content = self._content_callback(self.content)
         self.items = self.content['items']
@@ -200,6 +212,7 @@ class Pager:
         return
 
     def next(self):
+        """Go to the next page."""
         if not self.items or not self.next_url:
             raise PagerLimitReached
 
@@ -208,6 +221,7 @@ class Pager:
         return
 
     def previous(self):
+        """Go to the previous page."""
         if not self.previous_url:
             raise PagerPreviousUnavailable
 
