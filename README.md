@@ -97,8 +97,8 @@ Search results for "red velvet"
   1  Psycho                                     Red Velvet
   2  Monster                                    Red Velvet - IRENE & SEULGI
   3  Bad Boy                                    Red Velvet
-  4  빨간 맛 Red Flavor                          Red Velvet
-  5  피카부 Peek-A-Boo                           Red Velvet
+  4  빨간 맛 Red Flavor                         Red Velvet
+  5  피카부 Peek-A-Boo                          Red Velvet
   6  Naughty                                    Red Velvet - IRENE & SEULGI
   7  Power Up                                   Red Velvet
   8  Dumb Dumb                                  Red Velvet
