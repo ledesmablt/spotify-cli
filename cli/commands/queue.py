@@ -29,12 +29,16 @@ from ..utils.exceptions import AuthScopeError, FeatureInDevelopment
     '-q', '--quiet', is_flag=True,
     help='Suppress output.'
 )
-@click.argument('keyword', type=str, metavar='<keyword>')
+@click.argument(
+    'keyword', type=str, metavar='<keyword>',
+    nargs=-1, required=True
+)
 def queue(keyword, queue_type='track', yes=False, verbose=0, quiet=False):
     """Add a track or album to your queue.
 
     Example: Use 'spotify queue .' to add the current track.
     """
+    keyword = ' '.join(keyword)
     if keyword == '.':
         from cli.commands.status import status
         playback_data = status.callback(_return_parsed=True)

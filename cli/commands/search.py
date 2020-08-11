@@ -39,7 +39,8 @@ from ..utils.exceptions import *
     help='Output raw API response.'
 )
 @click.argument(
-    'keyword', type=str, metavar='<keyword>'
+    'keyword', type=str, metavar='<keyword>',
+    nargs=-1, required=True
 )
 def search(
     keyword, search_type='all', verbose=0,
@@ -49,6 +50,7 @@ def search(
     import urllib.parse as ul
     from tabulate import tabulate
 
+    keyword = ' '.join(keyword)
     pager = Spotify.Pager(
         'search',
         limit=limit,

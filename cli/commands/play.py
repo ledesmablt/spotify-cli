@@ -37,7 +37,10 @@ from ..utils.exceptions import *
     type=click.Choice(['all', 'track', 'off'], case_sensitive=False),
     help='Turn repeat on (all/track) or off.'
 )
-@click.argument('keyword', type=str, required=False, metavar='[<keyword>]')
+@click.argument(
+    'keyword', type=str, metavar='[<keyword>]',
+    required=False, nargs=-1
+)
 def play(
     keyword=None, play_type='track', verbose=0, quiet=False,
     shuffle=None, repeat=None, *args, **kwargs
@@ -50,6 +53,7 @@ def play(
     from cli.commands.shuffle import shuffle as shuffle_cmd
 
     requests = []
+    keyword = ' '.join(keyword)
     if keyword:
         import urllib.parse as ul
         pager = Spotify.Pager(

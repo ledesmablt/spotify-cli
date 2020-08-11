@@ -35,12 +35,16 @@ from ..utils.functions import cut_string
     '-q', '--quiet', is_flag=True,
     help='Suppress output.'
 )
-@click.argument('keyword', type=str, metavar='<keyword>')
+@click.argument(
+    'keyword', type=str, metavar='<keyword>',
+    nargs=-1, required=True
+)
 def save(keyword, save_type, yes, verbose=0, quiet=False):
     """Save a track, album, artist, or playlist.
 
     Example: Use 'spotify save .' to save the current track.
     """
+    keyword = ' '.join(keyword)
     if keyword == '.':
         from cli.commands.status import status
         playback_data = status.callback(_return_parsed=True)

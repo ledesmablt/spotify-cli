@@ -88,7 +88,7 @@ Switched to LENOVO - Computer
 
 Search for a track to play, queue, or save.
 ```
-$ spotify search "red velvet"
+$ spotify search red velvet
 
 Search results for "red velvet"
 
@@ -119,16 +119,16 @@ Continue searching? [Y/n]:
 
 Some commands support search queries (`play`, `queue`, `save`).
 ```
-$ spotify play "red velvet"
+$ spotify play red velvet
 Playing: Psycho
          Red Velvet - ‘The ReVe Festival’ Finale
 
-$ spotify queue --album "reve finale"
+$ spotify queue --album reve finale
 ‘The ReVe Festival’ Finale - Red Velvet (16 tracks)
 Add this album to the queue? [Y/n]: Y
 Album added to queue.
 
-$ spotify save --artist "red velvet"
+$ spotify save --artist red velvet
 Red Velvet
 Save this artist to your library? [Y/n]: Y
 Following artist - Red Velvet.
@@ -169,7 +169,6 @@ $ spotify status --raw | jq .context
   - You can just start and stop playback to "activate" your device.
   - Your device will remain "active" even when paused.
 - Some operations may not be supported on certain devices (i.e. volume control for mobile) and for users not subscribed to Spotify Premium.
-- In development: add to playlist.
 
 ## [License](LICENSE)
 
