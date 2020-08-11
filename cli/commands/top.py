@@ -30,14 +30,10 @@ from ..utils.exceptions import *
     help='Number of items to show.'
 )
 @click.option(
-    '-v', '--verbose', count=True,
-    help='Output more info (repeatable flag).'
-)
-@click.option(
     '--raw', is_flag=True,
     help='Output raw API response.'
 )
-def top(top_type, time, verbose=0, raw=False, limit=10, _return_parsed=False):
+def top(top_type, time, raw=False, limit=10, _return_parsed=False):
     """List your top tracks or artists."""
     from tabulate import tabulate
     pager = Spotify.Pager(
@@ -46,10 +42,8 @@ def top(top_type, time, verbose=0, raw=False, limit=10, _return_parsed=False):
         params={'time_range': time+'_term'}
     )
     if raw:
-        if verbose >= 0:
-            import json
-            click.echo(json.dumps(pager.content))
-
+        import json
+        click.echo(json.dumps(pager.content))
         return pager.content
 
     if top_type == 'tracks':

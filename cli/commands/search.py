@@ -31,10 +31,6 @@ from ..utils.exceptions import *
     metavar='<int>'
 )
 @click.option(
-    '-v', '--verbose', count=True,
-    help='Output more info (repeatable flag).'
-)
-@click.option(
     '--raw', is_flag=True,
     help='Output raw API response.'
 )
@@ -43,7 +39,7 @@ from ..utils.exceptions import *
     nargs=-1, required=True
 )
 def search(
-    keyword, search_type='all', verbose=0,
+    keyword, search_type='all',
     raw=False, limit=10, _return_parsed=False
 ):
     """Search for any Spotify content."""
@@ -61,10 +57,8 @@ def search(
         content_callback=lambda c: c[search_type+'s'],
     )
     if raw:
-        if verbose >= 0:
-            import json
-            click.echo(json.dumps(pager.content))
-
+        import json
+        click.echo(json.dumps(pager.content))
         return pager.content
 
     commands = {

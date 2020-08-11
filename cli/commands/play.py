@@ -20,14 +20,6 @@ from ..utils.exceptions import *
     help='Play a playlist'
 )
 @click.option(
-    '-v', '--verbose', count=True,
-    help='Output more info (repeatable flag).'
-)
-@click.option(
-    '-q', '--quiet', is_flag=True,
-    help='Suppress output.'
-)
-@click.option(
     '-s', '--shuffle',
     type=click.Choice(['on', 'off'], case_sensitive=False),
     help='Turn shuffle on or off.'
@@ -36,6 +28,14 @@ from ..utils.exceptions import *
     '-r', '--repeat',
     type=click.Choice(['all', 'track', 'off'], case_sensitive=False),
     help='Turn repeat on (all/track) or off.'
+)
+@click.option(
+    '-v', '--verbose', count=True,
+    help='Output more info (repeatable flag).'
+)
+@click.option(
+    '-q', '--quiet', is_flag=True,
+    help='Suppress output.'
 )
 @click.argument(
     'keyword', type=str, metavar='[<keyword>]',

@@ -13,23 +13,17 @@ from ..utils.exceptions import *
     metavar='<int>'
 )
 @click.option(
-    '-v', '--verbose', count=True,
-    help='Output more info (repeatable flag).'
-)
-@click.option(
     '--raw', is_flag=True,
     help='Output raw API response.'
 )
-def history(verbose=0, raw=False, limit=10, _return_parsed=False):
+def history(raw=False, limit=10, _return_parsed=False):
     """List your recently played tracks."""
     from tabulate import tabulate
     from datetime import datetime
     pager = Spotify.Pager('me/player/recently-played', limit=limit)
     if raw:
-        if verbose >= 0:
-            import json
-            click.echo(json.dumps(pager.content))
-
+        import json
+        click.echo(json.dumps(pager.content))
         return pager.content
 
     headers = ['Last played', 'Artist', 'Track']

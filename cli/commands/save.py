@@ -28,10 +28,6 @@ from ..utils.functions import cut_string
     help='Skip the confirmation prompt.'
 )
 @click.option(
-    '-v', '--verbose', count=True,
-    help='Output more info (repeatable flag).'
-)
-@click.option(
     '-q', '--quiet', is_flag=True,
     help='Suppress output.'
 )
@@ -39,7 +35,7 @@ from ..utils.functions import cut_string
     'keyword', type=str, metavar='<keyword>',
     nargs=-1, required=True
 )
-def save(keyword, save_type, yes, verbose=0, quiet=False):
+def save(keyword, save_type, yes, quiet=False):
     """Save a track, album, artist, or playlist.
 
     Example: Use 'spotify save .' to save the current track.

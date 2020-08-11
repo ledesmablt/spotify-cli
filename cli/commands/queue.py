@@ -22,10 +22,6 @@ from ..utils.exceptions import AuthScopeError, FeatureInDevelopment
     help='Skip the confirmation prompt.'
 )
 @click.option(
-    '-v', '--verbose', count=True,
-    help='Output more info (repeatable flag).'
-)
-@click.option(
     '-q', '--quiet', is_flag=True,
     help='Suppress output.'
 )
@@ -33,7 +29,7 @@ from ..utils.exceptions import AuthScopeError, FeatureInDevelopment
     'keyword', type=str, metavar='<keyword>',
     nargs=-1, required=True
 )
-def queue(keyword, queue_type='track', yes=False, verbose=0, quiet=False):
+def queue(keyword, queue_type='track', yes=False, quiet=False):
     """Add a track or album to your queue.
 
     Example: Use 'spotify queue .' to add the current track.
