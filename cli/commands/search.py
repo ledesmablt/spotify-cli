@@ -67,198 +67,14 @@ def search(
 
     commands = {
         0: ['[p]lay', '[q]ueue', '[s]ave'],
-        1: '[a]dd to playlist #[,...] <playlist>\n',
+        1: '[Ctrl+C] exit\n',
     }
     if search_type == 'artist':
         commands[0] = ['[s]ave']
-        commands.pop(1)
     elif search_type == 'playlist':
         commands[0] = ['[p]lay', '[s]ave']
-        commands.pop(1)
 
-    def _get_headers():
-        if search_type == 'track':
-            return [['Track', 'Artist'], None]
-        elif search_type == 'album':
-            return [['Album', 'Artist', '# of tracks'], None]
-        elif search_type == 'artist':
-            return [
-                ['Artist', 'Genre', 'Followers'],
-                ['left', 'left', 'right']
-            ]
-        elif search_type == 'playlist':
-            return [['Playlist', 'Created by', '# of tracks'], None]
-
-    def _get_conf_msg(cmd, search_type, indices_str):
-        mapping = {
-            'p': {
-                'track': (
-                    'Play the selected track/s? ({})'
-                    .format(indices_str)
-                ),
-                'album': (
-                    'Play the selected album? ({})'
-                    .format(indices_str.split(',')[0])
-                ),
-                'playlist': (
-                    'Play the selected playlist? ({})'
-                    .format(indices_str.split(',')[0])
-                ),
-            },
-            'q': {
-                'track': (
-                    'Queue the selected track/s? ({})'
-                    .format(indices_str)
-                ),
-                'album': (
-                    'Queue the selected album? ({})'
-                    .format(indices_str.split(',')[0])
-                ),
-                'playlist': (
-                    'Queue the selected playlist? ({})'
-                    .format(indices_str.split(',')[0])
-                ),
-            },
-            's': {
-                'track': (
-                    'Save the selected track/s? ({})'
-                    .format(indices_str)
-                ),
-                'artist': (
-                    'Save the selected artist/s? ({})'
-                    .format(indices_str)
-                ),
-                'album': (
-                    'Save the selected album/s? ({})'
-                    .format(indices_str)
-                ),
-                'playlist': (
-                    'Save the selected playlist/s? ({})'
-                    .format(indices_str)
-                ),
-            }
-        }
-        cmd_map = mapping.get(cmd)
-        if not cmd_map:
-            raise FeatureInDevelopment
-
-        output = cmd_map.get(search_type)
-        if not output:
-            raise InvalidInput(
-                '\nCommand not supported for {} search.'
-                .format(search_type)
-            )
-        else:
-            return output
-
-    def _parse(item, index):
-        if search_type == 'track':
-            item = parse_track_item_full(item)
-            output = {
-                'Track': cut_string(item['track']['name'], 50),
-                'Artist': cut_string(', '.join(item['artists']['names']), 30),
-                'uri': item['track']['uri'],
-                'id': item['track']['id'],
-                'context_uri': item['album']['uri'],
-                'track_number': item['track']['track_number'],
-            }
-        elif search_type == 'album':
-            output = {
-                'Album': cut_string(item['name'], 50),
-                'Artist': cut_string(
-                    ', '.join([a['name'] for a in item['artists']]), 30
-                ),
-                '# of tracks': item.get('total_tracks', 0),
-                'uri': item['uri'],
-                'id': item['id'],
-            }
-        elif search_type == 'artist':
-            output = {
-                'Artist': item['name'],
-                'Genre': cut_string(', '.join(item.get('genres', '')), 30),
-                'Followers': '{:,}'.format(item['followers'].get('total', 0)),
-                'uri': item['uri'],
-                'id': item['id'],
-            }
-        elif search_type == 'playlist':
-            output = {
-                'Playlist': cut_string(item['name'], 50),
-                'Created by': cut_string(
-                    item['owner'].get('display_name'), 30
-                ),
-                '# of tracks': item['tracks'].get('total', 0),
-                'uri': item['uri'],
-                'id': item['id'],
-            }
-
-        output['#'] = index
-        return output
-
-    def _format_play_req(selected):
-        if search_type == 'track':
-            if len(selected) == 1:
-                return {
-                    'context_uri': selected[0]['context_uri'],
-                    'offset': {
-                        'uri': selected[0]['uri'],
-                    },
-                }
-            else:
-                return {
-                    'uris': [track['uri'] for track in selected],
-                }
-
-        elif search_type in ['album', 'playlist']:
-            return {
-                'context_uri': selected[0]['uri']
-            }
-
-    def _format_queue_reqs(selected):
-        if search_type == 'track':
-            return [
-                {
-                    'endpoint': 'me/player/queue?uri=' + s['uri'],
-                    'method': 'POST',
-                }
-                for s in selected
-            ]
-
-        elif search_type == 'album':
-            album = spotify.request('albums/' + selected[0]['id'])
-            return [
-                {
-                    'endpoint': 'me/player/queue?uri=' + track['uri'],
-                    'method': 'post',
-                }
-                for track in album['tracks']['items']
-            ]
-
-    def _format_save_reqs(selected):
-        base_req = {
-            'method': 'PUT',
-            'handle_errs': {
-                403: (AuthScopeError, {'required_scope_key': 'user-modify'})
-            }
-        }
-        requests = []
-        for s in selected:
-            r = base_req.copy()
-            if search_type in ['track', 'album']:
-                r['endpoint'] = 'me/{}s?ids={}'.format(search_type, s['id'])
-            elif search_type == 'artist':
-                r['endpoint'] = (
-                    'me/following?type=artist&ids={}'
-                    .format(s['id'])
-                )
-            elif search_type == 'playlist':
-                r['endpoint'] = 'playlists/{}/followers'.format(s['id'])
-                r['data'] = {'public': True}
-
-            requests.append(r)
-
-        return requests
-
-    headers, colalign = _get_headers()
+    headers, colalign = _get_headers(search_type)
     headers.insert(0, '#')
     if colalign:
         colalign.insert(0, 'right')
@@ -270,20 +86,12 @@ def search(
     parsed_content = {}
     end_search = False
 
-    def _display_input_err():
-        click.echo(
-            '\nInput error! Please try again.\n'
-            'Format: <command> <#s comma delimited>\n'
-            'Example: q 3,2,1',
-            err=True
-        )
-        time.sleep(3)
-
+    print_table = True
     while not end_search:
         table = []
         for i, item in enumerate(pager.content['items']):
             index = pager.offset + 1 + i
-            parsed_item = _parse(item, index)
+            parsed_item = _parse(item, index, search_type)
             parsed_content[index] = parsed_item
             row = [parsed_item[h] for h in headers]
             table.append(row)
@@ -293,7 +101,9 @@ def search(
             return
 
         click.echo('\n', nl=False)
-        click.echo(tabulate(table, headers=headers, colalign=colalign))
+        if print_table:
+            click.echo(tabulate(table, headers=headers, colalign=colalign))
+
         response = click.prompt(
             '\nActions:\n'
             '[n]ext/[b]ack\n'
@@ -304,6 +114,9 @@ def search(
                 commands.get(1, '')
             )
         ).lower()
+
+        # if any error in the middle, do not print table
+        print_table = False
 
         cmd = response.split(' ')[0]
         if cmd == 'n':
@@ -332,7 +145,7 @@ def search(
             for i in indices:
                 try:
                     selected.append(parsed_content[int(i)])
-                except (ValueError, IndexError):
+                except (ValueError, IndexError, KeyError):
                     continue
 
             # parse command
@@ -353,7 +166,7 @@ def search(
 
             elif cmd == 'p':
                 from cli.commands.play import play
-                req_data = _format_play_req(selected)
+                req_data = _format_play_req(selected, search_type)
                 play.callback(data=req_data, quiet=True)
                 click.echo(
                     'Now playing: {}'
@@ -361,7 +174,7 @@ def search(
                 )
 
             elif cmd == 'q':
-                requests = _format_queue_reqs(selected)
+                requests = _format_queue_reqs(selected, search_type)
                 Spotify.multirequest(requests, delay_between=0.1)
                 click.echo(
                     '{} {}/s queued.'
@@ -369,18 +182,213 @@ def search(
                 )
 
             elif cmd == 's':
-                requests = _format_save_reqs(selected)
+                requests = _format_save_reqs(selected, search_type)
                 reqs = Spotify.multirequest(requests)
                 click.echo(
                     '{} {}/s saved.'
                     .format(len(selected), search_type)
                 )
 
-            else:
-                raise FeatureInDevelopment
-
+            print_table = True
             end_search = not click.confirm(
                 '\nContinue searching?', default=True
             )
 
     return
+
+
+def _get_headers(search_type):
+    if search_type == 'track':
+        return [['Track', 'Artist'], None]
+    elif search_type == 'album':
+        return [['Album', 'Artist', '# of tracks'], None]
+    elif search_type == 'artist':
+        return [
+            ['Artist', 'Genre', 'Followers'],
+            ['left', 'left', 'right']
+        ]
+    elif search_type == 'playlist':
+        return [['Playlist', 'Created by', '# of tracks'], None]
+
+
+def _get_conf_msg(cmd, search_type, indices_str):
+    mapping = {
+        'p': {
+            'track': (
+                'Play the selected track/s? ({})'
+                .format(indices_str)
+            ),
+            'album': (
+                'Play the selected album? ({})'
+                .format(indices_str.split(',')[0])
+            ),
+            'playlist': (
+                'Play the selected playlist? ({})'
+                .format(indices_str.split(',')[0])
+            ),
+        },
+        'q': {
+            'track': (
+                'Queue the selected track/s? ({})'
+                .format(indices_str)
+            ),
+            'album': (
+                'Queue the selected album? ({})'
+                .format(indices_str.split(',')[0])
+            ),
+            'playlist': (
+                'Queue the selected playlist? ({})'
+                .format(indices_str.split(',')[0])
+            ),
+        },
+        's': {
+            'track': (
+                'Save the selected track/s? ({})'
+                .format(indices_str)
+            ),
+            'artist': (
+                'Save the selected artist/s? ({})'
+                .format(indices_str)
+            ),
+            'album': (
+                'Save the selected album/s? ({})'
+                .format(indices_str)
+            ),
+            'playlist': (
+                'Save the selected playlist/s? ({})'
+                .format(indices_str)
+            ),
+        }
+    }
+    cmd_map = mapping.get(cmd)
+    if not cmd_map:
+        raise InvalidInput('\nCommand [{}] not found.'.format(cmd))
+
+    output = cmd_map.get(search_type)
+    if not output:
+        raise InvalidInput(
+            '\nCommand not supported for {} search.'
+            .format(search_type)
+        )
+    else:
+        return output
+
+
+def _parse(item, index, search_type):
+    if search_type == 'track':
+        item = parse_track_item_full(item)
+        output = {
+            'Track': cut_string(item['track']['name'], 50),
+            'Artist': cut_string(', '.join(item['artists']['names']), 30),
+            'uri': item['track']['uri'],
+            'id': item['track']['id'],
+            'context_uri': item['album']['uri'],
+            'track_number': item['track']['track_number'],
+        }
+    elif search_type == 'album':
+        output = {
+            'Album': cut_string(item['name'], 50),
+            'Artist': cut_string(
+                ', '.join([a['name'] for a in item['artists']]), 30
+            ),
+            '# of tracks': item.get('total_tracks', 0),
+            'uri': item['uri'],
+            'id': item['id'],
+        }
+    elif search_type == 'artist':
+        output = {
+            'Artist': item['name'],
+            'Genre': cut_string(', '.join(item.get('genres', '')), 30),
+            'Followers': '{:,}'.format(item['followers'].get('total', 0)),
+            'uri': item['uri'],
+            'id': item['id'],
+        }
+    elif search_type == 'playlist':
+        output = {
+            'Playlist': cut_string(item['name'], 50),
+            'Created by': cut_string(
+                item['owner'].get('display_name'), 30
+            ),
+            '# of tracks': item['tracks'].get('total', 0),
+            'uri': item['uri'],
+            'id': item['id'],
+        }
+
+    output['#'] = index
+    return output
+
+
+def _format_play_req(selected, search_type):
+    if search_type == 'track':
+        if len(selected) == 1:
+            return {
+                'context_uri': selected[0]['context_uri'],
+                'offset': {
+                    'uri': selected[0]['uri'],
+                },
+            }
+        else:
+            return {
+                'uris': [track['uri'] for track in selected],
+            }
+
+    elif search_type in ['album', 'playlist']:
+        return {
+            'context_uri': selected[0]['uri']
+        }
+
+
+def _format_queue_reqs(selected, search_type):
+    if search_type == 'track':
+        return [
+            {
+                'endpoint': 'me/player/queue?uri=' + s['uri'],
+                'method': 'POST',
+            }
+            for s in selected
+        ]
+
+    elif search_type == 'album':
+        album = spotify.request('albums/' + selected[0]['id'])
+        return [
+            {
+                'endpoint': 'me/player/queue?uri=' + track['uri'],
+                'method': 'post',
+            }
+            for track in album['tracks']['items']
+        ]
+
+
+def _format_save_reqs(selected, search_type):
+    base_req = {
+        'method': 'PUT',
+        'handle_errs': {
+            403: (AuthScopeError, {'required_scope_key': 'user-modify'})
+        }
+    }
+    requests = []
+    for s in selected:
+        r = base_req.copy()
+        if search_type in ['track', 'album']:
+            r['endpoint'] = 'me/{}s?ids={}'.format(search_type, s['id'])
+        elif search_type == 'artist':
+            r['endpoint'] = (
+                'me/following?type=artist&ids={}'
+                .format(s['id'])
+            )
+        elif search_type == 'playlist':
+            r['endpoint'] = 'playlists/{}/followers'.format(s['id'])
+            r['data'] = {'public': True}
+
+        requests.append(r)
+
+    return requests
+
+
+def _display_input_err():
+    click.echo(
+        'Input error! Please try again.\n'
+        'Format: <command> <#s comma delimited>\n'
+        'Example: q 3,2,1',
+        err=True
+    )
