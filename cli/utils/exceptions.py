@@ -36,7 +36,12 @@ class AuthScopeError(ClickException):
 class TokenExpired(ClickException):
     def __init__(self):
         """Signals a token refresh."""
-        pass
+        self.message = (
+            'Access token expired. Please try again.\n\n'
+            'If you are seeing this message, the token refresh has failed.\n'
+            'You may want to reauthenticate - spotify auth login'
+        )
+        super().__init__(self.message)
 
 
 # api
