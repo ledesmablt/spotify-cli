@@ -24,7 +24,7 @@ def format_duration_ms(ms):
 
 def build_auth_url(additional_scopes=[]):
     """Create the OAuth URL for the user-approved scopes."""
-    user_scopes = ['default'] + additional_scopes
+    user_scopes = ['Read & modify playback.'] + additional_scopes
     scopes = []
     for scope in AUTH_SCOPES_MAPPING:
         if scope['name'] in user_scopes:
