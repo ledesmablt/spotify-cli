@@ -18,9 +18,13 @@ def main(request):
     auth_code = request_data.get('auth_code')
     refresh_token = request_data.get('refresh_token')
     post_data = {
-        'client_id': CREDENTIALS['client_id'],
-        'client_secret': CREDENTIALS['client_secret'],
-        'redirect_uri': REDIRECT_URI
+        'client_id': (
+            request_data.get('client_id') or CREDENTIALS['client_id']
+        ),
+        'client_secret': (
+            request_data.get('client_secret') or CREDENTIALS['client_secret']
+        ),
+        'redirect_uri': REDIRECT_URI,
     }
     if auth_code:
         post_data['grant_type'] = 'authorization_code'

@@ -5,10 +5,16 @@ from click import ClickException
 # auth
 class AuthorizationError(ClickException):
     def __init__(self):
+        from .Spotify import get_config
         self.message = (
             'CLI not authenticated.\n'
             'Please run the command - spotify auth login'
         )
+        if get_config().get('client_id'):
+            self.message += (
+                '\n\nPlease also confirm that your provided client ID and '
+                'secret are correct.'
+            )
         super().__init__(self.message)
 
 

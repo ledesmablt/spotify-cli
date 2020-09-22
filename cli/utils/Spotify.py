@@ -52,6 +52,12 @@ def refresh(auth_code=None):
         else:
             raise AuthorizationError
 
+    # get custom id and secret if any
+    config = get_config()
+    for key in ['client_id', 'client_secret']:
+        if config.get(key):
+            post_data[key] = config[key]
+
     req = Request(
         REFRESH_URI,
         json.dumps(post_data).encode('ascii'),
@@ -83,8 +89,8 @@ def _handle_request(
     handle_errs={}, wait=0
 ):
     """Abstraction for handling requests to the Spotify API
-    with support for handling specific HTTP errors
-    ."""
+    with support for handling specific HTTP errors.
+    """
     if endpoint.startswith('/'):
         endpoint = endpoint[1:]
 
