@@ -18,6 +18,17 @@ Authorize the CLI & save your credentials locally.
 $ spotify auth login
 ```
 
+You may also pass [your own Spotify application](https://developer.spotify.com/dashboard/applications)'s
+client ID and secret if you want to track your usage or avoid
+API rate limiting issues (all users using the default client settings share the same rate limits).
+
+When doing so, please ensure that [this URL](https://asia-east2-spotify-cli-283006.cloudfunctions.net/auth-redirect)
+is listed as a Redirect URI in your application.
+```
+$ spotify auth login --client-id XXXXX --client-secret YYYYY
+```
+
+
 Start Spotify playback on any device and run the `spotify` command.
 ```
 $ spotify

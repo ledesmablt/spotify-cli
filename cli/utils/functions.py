@@ -22,7 +22,7 @@ def format_duration_ms(ms):
     return '{}:{}'.format(_format(m), _format(s))
 
 
-def build_auth_url(additional_scopes=[]):
+def build_auth_url(additional_scopes=[], client_id=''):
     """Create the OAuth URL for the user-approved scopes."""
     user_scopes = ['Read & modify playback.'] + additional_scopes
     scopes = []
@@ -34,10 +34,10 @@ def build_auth_url(additional_scopes=[]):
         'https://accounts.spotify.com/authorize?client_id={}'
         '&response_type=code&redirect_uri={}&scope={}&state={}'
         .format(
-            CLIENT_ID,
+            client_id or CLIENT_ID,
             ul.quote_plus(REDIRECT_URI),
             ul.quote_plus(" ".join(scopes)),
-            uuid1()
+            uuid1(),
         )
     )
     return auth_url
