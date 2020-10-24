@@ -20,6 +20,10 @@ from ..utils.exceptions import *
     help='Play a playlist'
 )
 @click.option(
+    '--uri', 'play_type', flag_value='uri',
+    help='Play a Spotify URI'
+)
+@click.option(
     '-s', '--shuffle',
     type=click.Choice(['on', 'off'], case_sensitive=False),
     help='Turn shuffle on or off.'
@@ -51,10 +55,20 @@ def play(
     play a track matching <keyword>.
     """
     from cli.commands.shuffle import shuffle as shuffle_cmd
-
+    
     requests = []
     keyword = ' '.join(keyword)
-    if keyword:
+       
+    if play_type == 'uri' and keyword:
+        if keyword.find('spotify:track') > -1:
+            kwargs['data'] = {
+                'uris': [keyword]
+            }
+        else:
+            kwargs['data'] = {
+                'context_uri': keyword
+            }
+    elif keyword:
         import urllib.parse as ul
         pager = Spotify.Pager(
             'search',
@@ -68,7 +82,7 @@ def play(
             click.echo('No results found for "{}"'.format(keyword), err=True)
             return
 
-        item = pager.content['items'][0]
+        item = pager.content['items'][0]            
         if play_type == 'track':
             kwargs['data'] = {
                 'context_uri': item['album']['uri'],
@@ -98,7 +112,7 @@ def play(
             repeat_cmd.callback(repeat, _create_request=True)
         )
         verbose = max(verbose, 1)
-
+    
     Spotify.multirequest(requests)
     Spotify.request(
         'me/player/play', method='PUT',
