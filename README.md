@@ -45,7 +45,7 @@ Commands:
   history   List your recently played tracks.
   next      Play the next track in the queue.
   pause     Pause playback.
-  play      Resume playback or search for a track/album/playlist to play.
+  play      Resume playback, search for a track/album/playlist, or select a URI to play.
   previous  Play the previous track in the queue.
   queue     Add a track or album to your queue.
   repeat    Turn repeat on (all/track) or off.
