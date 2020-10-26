@@ -49,7 +49,8 @@ def play(
     keyword=None, play_type='track', verbose=0, quiet=False,
     shuffle=None, repeat=None, *args, **kwargs
 ):
-    """Resume playback or search for a track/album/playlist to play.
+    """Resume playback, search for a track/album/playlist,
+    or select a URI to play.
 
     Example: Use 'spotify play <keyword>' to search for and
     play a track matching <keyword>.
