@@ -58,7 +58,8 @@ def play(
     from cli.commands.shuffle import shuffle as shuffle_cmd
     
     requests = []
-    keyword = ' '.join(keyword)
+    if keyword:
+        keyword = ' '.join(keyword)
        
     if play_type == 'uri' and keyword:
         if keyword.find('spotify:track') > -1:
