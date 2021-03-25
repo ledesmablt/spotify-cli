@@ -53,6 +53,7 @@ Commands:
   search    Search for any Spotify content.
   shuffle   Turn shuffle on or off.
   status    Describe the current playback session.
+  toggle    Resume any paused playback, or pause it if already running.
   top       List your top tracks or artists.
   volume    Control the active device's volume level (0-100).
 ```
