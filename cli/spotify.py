@@ -19,6 +19,7 @@ from cli.commands.history import history
 from cli.commands.toggle import toggle
 from cli.commands.top import top
 from cli.commands.search import search
+from cli.commands.seek import seek
 
 
 # CLI group
@@ -50,3 +51,4 @@ cli.add_command(history)
 cli.add_command(toggle)
 cli.add_command(top)
 cli.add_command(search)
+cli.add_command(seek)
