@@ -17,7 +17,7 @@ def seek(position):
               spotify seek -- -1m10s
               spotify seek 50%
     """
-    tokens = [s for s in re.split('(%|ms|m|s|\+|\-)', positionq) if len(s) > 0]
+    tokens = [s for s in re.split('(%|ms|m|s|\+|\-)', position) if len(s) > 0]
     print (tokens)
     if len(tokens) > 0:
         from cli.commands.status import status
@@ -61,6 +61,8 @@ def seek(position):
 
         if relative_factor != 0:
             new_position_ms = progress_ms + relative_factor * new_position_ms
+
+        new_position_ms = min(max(0, new_position_ms), duration_ms)
 
         Spotify.request(
             'me/player/seek?position_ms={}'.format(new_position_ms),
