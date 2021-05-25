@@ -6,7 +6,7 @@ from ..utils.exceptions import *
 
 @click.command(options_metavar='[<options>]')
 @click.argument(
-    'mode', type=click.Choice(['to', 'forward', 'rewind'], case_sensitive=False),
+    'mode', type=click.Choice(['to', 'forward', 'rewind', 'percent'], case_sensitive=False),
     metavar='<mode>'
 )
 @click.argument(
@@ -29,6 +29,8 @@ def seek(mode, position):
             new_position_ms = min(int(progress_ms + position * 1000), duration_ms)
         elif mode == 'rewind':
             new_position_ms = max(int(progress_ms - position * 1000), 0)
+        elif mode == 'percent':
+            new_position_ms = int((position / 100.0) * duration_ms)
 
     Spotify.request(
         'me/player/seek?position_ms={}'.format(new_position_ms),
