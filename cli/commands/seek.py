@@ -11,9 +11,9 @@ from ..utils.exceptions import *
     metavar='<position>'
 )
 def seek(position):
-    """Seek to time (in seconds) in current track.
+    """Seek to time (in seconds if no unit is mentioned) in current track.
 
-    Examples: spotify seek +70s
+    Examples: spotify seek +70
               spotify seek -- -1m10s
               spotify seek 50%
     """
@@ -57,7 +57,7 @@ def seek(position):
                 expect_unit = False
                 value = None
         if value is not None:
-            raise InvalidInput(' Expected unit (m, s, ms or %) at the end of the input.')
+            new_position_ms += int(value * 1000)
 
         if relative_factor != 0:
             new_position_ms = progress_ms + relative_factor * new_position_ms
