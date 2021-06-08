@@ -6,32 +6,36 @@ from ..utils.exceptions import *
 
 
 @click.command(options_metavar='[<options>]')
+@click.option(
+    '-f', '--forward', is_flag=True,
+    help='Increment playback position'
+)
+@click.option(
+    '-r', '--rewind', is_flag=True,
+    help='Decrement playback position'
+)
 @click.argument(
     'position', type=str,
     metavar='<position>'
 )
-def seek(position):
+def seek(forward, rewind, position):
     """Seek to time (in seconds if no unit is mentioned) in current track.
 
-    Examples: spotify seek +70
-              spotify seek -- -1m10s
-              spotify seek 50%
+    Examples: spotify seek --forward 70 # increment playback position by 70s
+              spotify seek -r 1m10s     # decrement playback position by 70s
+              spotify seek 50%          # set playback position to half the track duration
     """
-    tokens = [s for s in re.split('(%|ms|m|s|\+|\-)', position) if len(s) > 0]
-    print (tokens)
+    tokens = [s for s in re.split('(%|ms|m|s)', position) if len(s) > 0]
+    relative_factor = 0
+    if rewind:
+        relative_factor = -1
+    if forward:
+        relative_factor = 1
     if len(tokens) > 0:
         from cli.commands.status import status
         status_data = status.callback(raw=True, verbose=-1)
         progress_ms = status_data.get('progress_ms')
         duration_ms = status_data.get('item').get('duration_ms')
-
-        relative_factor = 0
-        if tokens[0] == '+':
-            relative_factor = 1
-            tokens.pop(0)
-        elif tokens[0] == '-':
-            relative_factor = -1
-            tokens.pop(0)
 
         expect_unit = False
         new_position_ms = 0
