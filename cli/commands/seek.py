@@ -11,15 +11,15 @@ from ..utils.exceptions import *
     help='Increment playback position'
 )
 @click.option(
-    '-r', '--rewind', is_flag=True,
+    '-r', '--reverse', is_flag=True,
     help='Decrement playback position'
 )
 @click.argument(
     'position', type=str,
     metavar='<position>'
 )
-def seek(forward, rewind, position):
-    """Seek to time (in seconds if no unit is mentioned) in current track.
+def seek(forward, reverse, position):
+    """Seek to time (default unit: seconds) in the current track.
 
     Examples: spotify seek --forward 70 # increment playback position by 70s
               spotify seek -r 1m10s     # decrement playback position by 70s
@@ -27,7 +27,7 @@ def seek(forward, rewind, position):
     """
     tokens = [s for s in re.split('(%|ms|m|s)', position) if len(s) > 0]
     relative_factor = 0
-    if rewind:
+    if reverse:
         relative_factor = -1
     if forward:
         relative_factor = 1
@@ -73,5 +73,6 @@ def seek(forward, rewind, position):
             method='PUT',
             handle_errs={404: NoPlaybackError}
         )
-        click.echo('Position set to {} ms.'.format(new_position_ms))
+        click.echo('Position set to {}m{}s.'.format( \
+                   new_position_ms // 60000, (new_position_ms // 1000) % 60))
     return
