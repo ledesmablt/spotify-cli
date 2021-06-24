@@ -73,6 +73,10 @@ def seek(forward, reverse, position):
             method='PUT',
             handle_errs={404: NoPlaybackError}
         )
-        click.echo('Position set to {}m{}s.'.format( \
-                   new_position_ms // 60000, (new_position_ms // 1000) % 60))
+
+        position_str = ""
+        if new_position_ms >= 60000:
+            position_str += "{}m".format(new_position_ms // 60000)
+        position_str += "{}s".format((new_position_ms // 1000) % 60)
+        click.echo('Position set to {}.'.format(position_str))
     return
