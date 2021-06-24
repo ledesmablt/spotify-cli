@@ -45,12 +45,13 @@ Commands:
   history   List your recently played tracks.
   next      Play the next track in the queue.
   pause     Pause playback.
-  play      Resume playback, search for a track/album/playlist, or select a URI to play.
+  play      Resume playback, search for a track/album/playlist, or select a...
   previous  Play the previous track in the queue.
   queue     Add a track or album to your queue.
   repeat    Turn repeat on (all/track) or off.
   save      Save a track, album, artist, or playlist.
   search    Search for any Spotify content.
+  seek      Seek to time (default unit: seconds) in the current track.
   shuffle   Turn shuffle on or off.
   status    Describe the current playback session.
   toggle    Resume any paused playback, or pause it if already running.
