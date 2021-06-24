@@ -21,9 +21,12 @@ from ..utils.exceptions import *
 def seek(forward, reverse, position):
     """Seek to time (default unit: seconds) in the current track.
 
-    Examples: spotify seek --forward 70 # increment playback position by 70s
-              spotify seek -r 1m10s     # decrement playback position by 70s
-              spotify seek 50%          # set playback position to half the track duration
+    \b
+    Examples:
+    spotify seek -f 50        # increment playback position by 50s
+    spotify seek -r 1m10s     # decrement playback position by 1m10s
+    spotify seek 50%          # set playback position to half the track duration
+    spotify seek 2m           # set playback position to 2 minutes into the track
     """
     tokens = [s for s in re.split('(%|ms|m|s)', position) if len(s) > 0]
     relative_factor = 0
