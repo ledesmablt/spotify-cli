@@ -67,12 +67,7 @@ def save(keyword, save_type, yes, quiet=False):
 
     if save_type in ['track', 'album']:
         id_str = music['id']
-        name = '{} - {}'.format(
-            cut_string(music['name'], 50),
-            cut_string(
-                ', '.join(parse_artists(music['artists'])['names']), 30
-            ),
-        )
+        name = cut_string(music['name'], 50)
 
     elif save_type == 'artist':
         id_str = music['id']
