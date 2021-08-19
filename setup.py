@@ -1,7 +1,7 @@
 import os
 from setuptools import setup, find_packages
 
-VERSION = os.environ['SPOTIFY_CLI_VERSION']
+VERSION = os.environ['RELEASE_VERSION']
 
 with open('README.md', 'r') as f:
     long_description = f.read()
