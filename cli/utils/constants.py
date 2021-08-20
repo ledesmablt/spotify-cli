@@ -8,11 +8,12 @@ DEFAULT_HEADERS = {
 
 # credential storage
 HOME = os.path.expanduser('~')
-CONFIG_DIR = os.path.join(HOME, '.config')
-CREDS_DIR = os.path.join(CONFIG_DIR, 'spotify-cli')
-CREDS_PATH = os.path.join(CREDS_DIR, 'credentials.json')
-CONFIG_PATH = os.path.join(CREDS_DIR, 'config.json')
-for folder in [CONFIG_DIR, CREDS_DIR]:
+SYSTEM_CONFIG_DIR = os.path.join(HOME, '.config')
+APP_CONFIG_DIR = os.path.join(SYSTEM_CONFIG_DIR, 'spotify-cli')
+CREDS_PATH = os.path.join(APP_CONFIG_DIR, 'credentials.json')
+CONFIG_PATH = os.path.join(APP_CONFIG_DIR, 'config.json')
+LAST_RESPONSE_PATH = os.path.join(APP_CONFIG_DIR, 'last-response.json')
+for folder in [SYSTEM_CONFIG_DIR, APP_CONFIG_DIR]:
     if not os.path.exists(folder):
         os.mkdir(folder)
 

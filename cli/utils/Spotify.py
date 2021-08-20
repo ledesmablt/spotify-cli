@@ -17,6 +17,11 @@ def _read_json(file_path):
     return data
 
 
+def _save_last_response(response):
+    with open(LAST_RESPONSE_PATH, 'w') as f:
+        json.dump(response, f)
+
+
 def get_credentials():
     """Read locally stored credentials file for API authorization."""
     return _read_json(CREDS_PATH)
@@ -108,18 +113,17 @@ def _handle_request(
     time.sleep(wait)
     try:
         with urlopen(req) as res:
+            res_data = {}
             if res.status == 200:
                 res_str = res.read()
                 if type(res_str) == bytes:
                     res_str = res_str.decode('utf-8')
 
-                if len(res_str) == 0:
-                    return {}
-                else:
-                    return json.loads(res_str)
+                if len(res_str) > 0:
+                    res_data = json.loads(res_str)
 
-            elif res.status == 204:
-                return {}
+            _save_last_response(res_data)
+            return res_data
 
     except HTTPError as e:
         if e.status in ignore_errs:
