@@ -1,8 +1,6 @@
 import os
 from setuptools import setup, find_packages
 
-# PS> $env:RELEASE_VERSION = "vX.Y.Z"
-# pip install .
 VERSION = os.environ['RELEASE_VERSION']
 
 with open('README.md', 'r') as f:

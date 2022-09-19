@@ -32,7 +32,10 @@ from cli.utils.classes import AliasedGroup
     options_metavar='[<options>]',
     subcommand_metavar='<command>'
 )
-@click.version_option(message='spotify-cli, version %(version)s')
+# UPDATED: Add package name to stop click RuntimeError caused by not
+# detecting the package_name
+@click.version_option(message='spotify-cli, version %(version)s',
+                      package_name='spotify-cli')
 def cli():
     pass
 
