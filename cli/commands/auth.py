@@ -77,7 +77,8 @@ def login(client_id='', client_secret=''):
         'By default, spotify-cli will enable reading & '
         'modifying the playback state.\n'
     )
-    choice = prompt([{
+    # UPDATED: Now using the GitHub repo instead of PyPI
+    choice = prompt.prompt([{
         'type': 'checkbox',
         'name': 'scopes',
         'message': (
@@ -98,7 +99,7 @@ def login(client_id='', client_secret=''):
     click.confirm('Proceed with these settings?', default=True, abort=True)
 
     # handle auth and save credentials
-    url = build_auth_url(additional_scopes, client_id)
+    url = build_auth_url(additional_scopes, client_id)  # type: ignore
     webbrowser.open(url)
     click.echo(
         '\nGo to the following link in your browser:\n\n\t{}\n'
@@ -120,7 +121,7 @@ def login(client_id='', client_secret=''):
 def status(verbose):
     """Show who's logged in."""
     user_data = Spotify.request('me', method='GET')
-    click.echo('Logged in as {}'.format(user_data['display_name']))
+    click.echo('Logged in as {}'.format(user_data['display_name']))  # type: ignore
     if verbose:
         click.echo('Credentials stored in {}'.format(CREDS_PATH))
     return

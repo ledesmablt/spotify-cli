@@ -1,6 +1,8 @@
 import os
 from setuptools import setup, find_packages
 
+# PS> $env:RELEASE_VERSION = "vX.Y.Z"
+# pip install .
 VERSION = os.environ['RELEASE_VERSION']
 
 with open('README.md', 'r') as f:
@@ -22,7 +24,8 @@ setup(
     packages=find_packages(),
     install_requires=[
         'Click',
-        'PyInquirer',
+        # PyPI release does not support Python v3.10 (causes ImportError)
+        'PyInquirer @ git+https://github.com/CITGuru/PyInquirer',
         'tabulate',
     ],
     entry_points='''
