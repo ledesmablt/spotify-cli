@@ -22,8 +22,7 @@ setup(
     packages=find_packages(),
     install_requires=[
         'Click',
-        # PyPI release does not support Python v3.10 (causes ImportError)
-        'PyInquirer @ git+https://github.com/CITGuru/PyInquirer',
+        'PyInquirer',
         'tabulate',
     ],
     entry_points='''

@@ -24,7 +24,7 @@ def devices(verbose=False, switch_to='', raw=False):
     Only devices with an active Spotify session will be recognized.
     """
     res = Spotify.request('me/player/devices', method='GET')
-    if not res.get('devices'):  # type: ignore
+    if not res.get('devices'):
         raise NoPlaybackError
 
     if raw:
@@ -36,7 +36,7 @@ def devices(verbose=False, switch_to='', raw=False):
 
     # parsed
     devices_list = sorted(
-        res['devices'],  # type: ignore
+        res['devices'],
         key=lambda x: (x['is_active'], x['type'], x['name'])
     )
     for device in devices_list:
@@ -108,8 +108,7 @@ def devices(verbose=False, switch_to='', raw=False):
             'message': message,
             'choices': choices,
         }]
-        # UPDATED: Now using the GitHub repo instead of PyPI
-        choice = prompt.prompt(questions)
+        choice = prompt(questions)
         if not choice:
             return
 
