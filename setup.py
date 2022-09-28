@@ -21,6 +21,7 @@ setup(
 
     packages=find_packages(),
     install_requires=[
+        'importlib-metadata==4.2',
         'Click',
         'beaupy',
         'tabulate',
