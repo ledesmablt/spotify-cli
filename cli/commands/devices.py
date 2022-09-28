@@ -1,3 +1,4 @@
+import beaupy
 import click
 
 from ..utils import Spotify
@@ -87,35 +88,31 @@ def devices(verbose=False, switch_to='', raw=False):
             message = 'Please select the device to activate.\n'
             choices = matched_devices
 
-        choices = map(
-            lambda x: {
-                'value': x['formatted_name'],
-                'name': x['formatted_name'] + (
-                    '' if not x['is_active'] else ' (active)'
-                ),
-            },
-            sorted(
-                choices,
-                key=lambda x: (x['is_active'], x['formatted_name'])
-            )
-        )
+        # Comprehension is more Pythonic than map() and
+        # beaupy uses preprocessor instead of choice dicts
+        # Also the map of lambda of sorted took me a while to decipher ;-;
+        choices = sorted(choices,
+                         key=lambda x: (x['is_active'], x['formatted_name']))
 
-        # interactive prompt
-        from PyInquirer import prompt
-        questions = [{
-            'type': 'list',
-            'name': 'formatted_name',
-            'message': message,
-            'choices': choices,
-        }]
-        # UPDATED: Now using the GitHub repo instead of PyPI
-        choice = prompt.prompt(questions)
-        if not choice:
+        # Interactive prompt
+        click.echo(message)
+
+        def name_to_display(choice: dict) -> str:
+            """Replacement for 'value' in PyInquirer choice dicts."""
+            name = choice['formatted_name']
+            if choice['is_active']:
+                return name + ' (active)'
+            return name
+
+        choice = beaupy.select(options=choices,
+                               preprocessor=name_to_display)
+
+        if choice is None:
             return
 
         matched_devices = [
             x for x in devices_list
-            if choice['formatted_name'] == x['formatted_name']
+            if choice['formatted_name'] == x['formatted_name']  # type: ignore
         ]
 
     to_activate = matched_devices[0]

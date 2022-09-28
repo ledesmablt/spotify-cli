@@ -1,7 +1,7 @@
-import os
-import json
-import time
+import webbrowser
+from typing import Optional
 
+import beaupy
 import click
 
 from ..utils import Spotify
@@ -60,38 +60,46 @@ def login(client_id='', client_secret=''):
         'client_secret': client_secret,
     })
 
-    # select scopes
-    import webbrowser
-    from PyInquirer import prompt
-    enabled_scopes = Spotify.get_config().get('auth_scopes', [])
-    choices = []
-    for scope in AUTH_SCOPES_MAPPING:
-        if scope['value'] == 'default':
-            continue
-        choices.append({
-            'name': scope['name'],
-            'checked': scope['name'] in enabled_scopes,
-        })
+    # Select scopes
+    
+    # The strings are values for the 'name' key in respective auth scope
+    enabled_scopes: list[str] = Spotify.get_config().get('auth_scopes', [])
 
     click.echo(
         'By default, spotify-cli will enable reading & '
         'modifying the playback state.\n'
     )
-    # UPDATED: Now using the GitHub repo instead of PyPI
-    choice = prompt.prompt([{
-        'type': 'checkbox',
-        'name': 'scopes',
-        'message': (
-            'Please select which additional features '
-            'you want to authorize.'
-        ),
-        'choices': choices,
-    }])
-    if not choice:
+    
+    click.echo(
+        'Please select which additional features '
+        'you want to authorize.'
+    )
+    
+    # Determine which choices to prompt
+    choices = []
+    ticked = []
+    index = 0
+    for scope in AUTH_SCOPES_MAPPING:
+        # Ignore the default scope
+        if scope['value'] != 'default':
+            choices.append(scope['name'])
+            if scope['name'] in enabled_scopes:
+                ticked.append(index)
+            index += 1
+
+    # Prompt users to choose additional scopes
+    additional_scopes = beaupy.select_multiple(options=choices,
+                                               ticked_indices=ticked)
+    
+    # UPDATED: Stopped choosing zero from doing nothing
+    # User should be able to set their preference to no additional features
+    # Instead, do nothing if there's no change in chosen options
+    # set() casting necessary because scopes can be read in a different order
+    if set(additional_scopes) == set(enabled_scopes):
+        click.echo('No change in existing credentials.')
         return
 
-    # confirm
-    additional_scopes = choice.get('scopes', [])
+    # Confirm
     click.echo(
         '\n{} features selected. This will overwite your existing credentials.'
         .format(len(additional_scopes))
@@ -121,7 +129,8 @@ def login(client_id='', client_secret=''):
 def status(verbose):
     """Show who's logged in."""
     user_data = Spotify.request('me', method='GET')
-    click.echo('Logged in as {}'.format(user_data['display_name']))  # type: ignore
+    click.echo('Logged in as {}'.format(
+        user_data['display_name']))  # type: ignore
     if verbose:
         click.echo('Credentials stored in {}'.format(CREDS_PATH))
     return
